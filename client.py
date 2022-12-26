@@ -11,7 +11,4 @@ clientSocket.connect((hostIp, portNumber))
 while True:
     clientMessage = input("Client says: ")
     clientSocket.send(clientMessage.encode("utf-8"))
-    serverMessage = clientSocket.recv(2048)
-    print("Server says: ", serverMessage.decode("utf-8"))
-
 clientSocket.close()

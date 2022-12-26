@@ -1,25 +1,26 @@
 from socket import *
+from threading import *
 
-try:
-    hostSocket = socket(AF_INET, SOCK_STREAM)
-    hostSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR,1)
-    hostIp = "127.0.0.1"
-    portNumber = 7500
-    hostSocket.bind((hostIp, portNumber))
-    hostSocket.listen()
-    print ("Waiting for connection...")
-    clientSocket, clientAddress = hostSocket.accept()
-    print ("Connection established with: ", clientAddress[0])
+def clientThread(clientSocket, clientAddress):
     while True:
-        clientMessage = clientSocket.recv(2048)
-        print ("Client says: ", clientMessage.decode("utf-8"))
-        serverMessage = input("Server says: ")
-        clientSocket.send(serverMessage.encode("utf-8"))
-    hostSocket.close()
+        message = clientSocket.recv(1024).decode("utf-8")
+        print(clientAddress[0] + ":" + str(clientAddress[1]) +" says: "+ message)
+
+    clientSocket.close()
 
 
-except error:
-    print(error)
+hostSocket = socket(AF_INET, SOCK_STREAM)
+hostSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR,1)
+hostIp = "127.0.0.1"
+portNumber = 7500
+hostSocket.bind((hostIp, portNumber))
+hostSocket.listen()
+print ("Waiting for connection...")
 
-except KeyboardInterrupt:
-    print(KeyboardInterrupt)
+
+
+while True:
+    clientSocket, clientAddress = hostSocket.accept()
+    print ("Connection established with: ", clientAddress[0] + ":" + str(clientAddress[1]))
+    thread = Thread(target=clientThread, args=(clientSocket, clientAddress, ))
+    thread.start()
