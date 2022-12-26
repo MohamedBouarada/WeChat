@@ -5,7 +5,7 @@ import threading
 
 window = tk.Tk()
 window.title("Client")
-username = " "
+
 
 
 topFrame = tk.Frame(window)
@@ -36,7 +36,7 @@ tkMessage.config(highlightbackground="grey", state="disabled")
 tkMessage.bind("<Return>", (lambda event: getChatMessage(tkMessage.get("1.0", tk.END))))
 bottomFrame.pack(side=tk.BOTTOM)
 
-
+username = " "
 def connect():
     global username, client
     if len(entName.get()) < 1:
@@ -57,7 +57,7 @@ def connect_to_server(name):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect((HOST_ADDR, HOST_PORT))
         client.send(name.encode()) # Send name to server after connecting
-
+        
         entName.config(state=tk.DISABLED)
         btnConnect.config(state=tk.DISABLED)
         tkMessage.config(state=tk.NORMAL)

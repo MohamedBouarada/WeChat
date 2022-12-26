@@ -49,6 +49,9 @@ def start_server():
     btnStop.config(state=tk.NORMAL)
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
     print(socket.AF_INET)
     print(socket.SOCK_STREAM)
 
@@ -64,6 +67,10 @@ def start_server():
 # Stop server function
 def stop_server():
     global server
+    server.shutdown(socket.SHUT_RDWR)
+    server.close()
+    print ("closed")
+    # server.close()
     btnStart.config(state=tk.NORMAL)
     btnStop.config(state=tk.DISABLED)
 
