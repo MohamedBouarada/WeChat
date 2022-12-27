@@ -110,7 +110,7 @@ load_dotenv()
 s = LdapServer(admin_pwd=os.environ['ADMIN_PWD'])
 # Test :
 # test login
-# s.login(username="hamma", password="0000")
+# s.login(username="bo3", password="1234")
 
 # test register
 user_toAdd = {
@@ -121,4 +121,4 @@ user_toAdd = {
     'group_id': 5000,  
     'uid': '11001'  
 }
-s.register(user_toAdd)
+# s.register(user_toAdd)
