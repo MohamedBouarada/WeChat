@@ -7,6 +7,8 @@ from PIL import ImageTk, Image
 
 
 class Signup:
+    def __init__(self,base=None):
+        self.base=base
 
     def Register(self, event=None):
         self.error_label.place(relx=0.65, y=385,anchor=CENTER)
@@ -51,6 +53,14 @@ class Signup:
         btn_back = Button(Home, text='Back', command=self.Back).pack(pady=20, fill=X)
 
     
+    def loginPage(self):
+        self.root.withdraw()
+        self.root.destroy()
+        
+        from login import LoginPage
+        login = LoginPage()
+        # self.root.destroy()
+        login.main()
     
     def Back(self):
         Home.destroy()
@@ -58,11 +68,16 @@ class Signup:
 
     def main(self):
         # main frame
-        self.root = Tk()
+        self.root = Toplevel(self.base)
         self.root.geometry('700x400')
         self.root.title("Signup Form")
         self.root.config(bg=colors.login_bg)
-
+        # self.canvas = Canvas(self.root, width=700, height=400)
+        # self.canvas.pack()
+        # IMAGE_PATH = './assets/bg2.jpg'
+        # self.img = ImageTk.PhotoImage(Image.open(IMAGE_PATH).resize((700, 400), Image.ANTIALIAS))
+        # self.canvas.background = self.img
+        # self.bg =self.canvas.create_image(0, 0, anchor=NW, image=self.img)
         # data binding
         self.USERNAME = StringVar(self.root)
         self.EMAIL = StringVar(self.root)
@@ -71,9 +86,9 @@ class Signup:
         self.UID = StringVar(self.root)
         
         # backround image
-        img =Image.open('/home/mohamed/GL4/WeChat/assets/bg2.jpg').resize((700,400))
-        bg = ImageTk.PhotoImage(img)
-        label = Label(self.root, image=bg )
+        self.img =Image.open('/home/mohamed/GL4/WeChat/assets/bg2.jpg').resize((700,400))
+        self.bg = ImageTk.PhotoImage(self.img)
+        label = Label(self.root, image=self.bg )
         label.place(x = 0,y = 0)
         label.pack(fill=BOTH, expand=YES)
 
@@ -149,7 +164,14 @@ class Signup:
         btn.place(relx=0.5, y=340,anchor=CENTER)
 
         btn.bind('<Return>', self.Register)
-        btn.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground="#35a666", activeforeground=colors.blue_dark)
+        btn.config(bg="#35a666", fg="#FFFFFF",activebackground="#0AAE2F", activeforeground=colors.blue_dark)
+
+        # Submit button
+        btnlogin = Button(self.root, text='Login', width=10, bg=colors.blue_dark,fg=colors.blue_dark, command=self.loginPage)
+        btnlogin.place(relx=0.7, y=340,anchor=CENTER)
+
+        btnlogin.bind('<Return>', self.loginPage)
+        btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
         
 
         
@@ -157,5 +179,5 @@ class Signup:
         print("Signup :)")
 
 
-s = Signup()
-s.main()
+# s = Signup()
+# s.main()

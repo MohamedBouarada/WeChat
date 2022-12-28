@@ -1,10 +1,15 @@
 from tkinter import *
 from ldap_server import LdapServer
-import time
+
 import admin_pwd
 import colors
 from PIL import ImageTk, Image  
+
 class LoginPage:
+    # visit=False
+    def __init__(self,base=None):
+        self.base=base
+
     def Login(self,event=None):
         self.error_label.place(relx=0.65, y=340,anchor=CENTER)
         if self.USERNAME.get() == "" or self.PASSWORD.get() == "":
@@ -39,6 +44,14 @@ class LoginPage:
         lbl_home = Label(Home, text="Successfully Login!",font=('times new roman', 20)).pack()
         btn_back = Button(Home, text='Back', command=self.Back).pack(pady=20, fill=X)
 
+    def signupPage(self):
+        self.root.withdraw()
+        self.root.destroy()
+        
+        from signup import Signup
+        login = Signup()
+        # self.root.destroy()
+        login.main()
 
     def Back(self):
         Home.destroy()
@@ -46,7 +59,15 @@ class LoginPage:
 
     # main frame
     def main(self):
-        self.root = Tk()
+        # print(self.visit)
+        # if self.visit:
+        #     self.root.deiconify()
+        # else:
+        #     self.visit=True
+        #     print('isfalse ',self.visit)
+        #     self.root=Toplevel()
+        self.root=Toplevel(self.base)    
+        # self.root = Toplevel(self.base)
         self.root.geometry('700x400')
         self.root.title("Login Form")
         self.root.config(bg=colors.login_bg)
@@ -57,6 +78,7 @@ class LoginPage:
         self.PASSWORD = StringVar(self.root)
 
         # backround image
+        # imgscreen=Toplevel(self.root,bg=colors.login_bg)
         img =Image.open('/home/mohamed/GL4/WeChat/assets/bg2.jpg').resize((700,400))
         bg = ImageTk.PhotoImage(img)
         label = Label(self.root, image=bg )
@@ -97,7 +119,14 @@ class LoginPage:
         btn.place(relx=0.5, y=300,anchor=CENTER)
 
         btn.bind('<Return>', self.Login)
-        btn.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground="#35a666", activeforeground=colors.blue_dark)
+        btn.config(bg="#35a666", fg="#FFFFFF",activebackground="#0AAE2F", activeforeground=colors.blue_dark)
+
+        # Submit button
+        btnlogin = Button(self.root, text='SignUp', width=10, bg=colors.blue_dark,fg=colors.blue_dark, command=self.signupPage)
+        btnlogin.place(relx=0.7, y=300,anchor=CENTER)
+
+        btnlogin.bind('<Return>', self.signupPage)
+        btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
         # Error label
         self.error_label = Label(self.root,width=30,  font=("bold", 12))
