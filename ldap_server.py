@@ -95,8 +95,17 @@ class LdapServer():
         ldap_conn.simple_bind_s(self.LDAP_ADMIN_DN, self.LDAP_ADMIN_PWD)
 
         try:
+            search_filter = "cn=" + user['username']
+            result = ldap_conn.search_s(LDAP_BASE_DN, ldap.SCOPE_SUBTREE, search_filter)
+            # print(result)
             # add entry in the directory
-            ldap_conn.add_s(dn, entry)
+            if not result:
+                ldap_conn.add_s(dn, entry)
+                return None
+            else:
+                print("user already exists !!!")
+                return "user already exists !!!"
+            
         finally:
             # disconnect and free memory
             ldap_conn.unbind_s()
