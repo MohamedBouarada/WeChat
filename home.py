@@ -25,7 +25,7 @@ class HomePage:
         
         from login import LoginPage
         login = LoginPage(base=self.root)
-        self.root.destroy()
+        # self.root.destroy()
         login.main()
     
 

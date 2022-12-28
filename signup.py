@@ -4,37 +4,46 @@ import time
 import admin_pwd
 import colors
 from PIL import ImageTk, Image  
-
+import re
 
 class Signup:
     def __init__(self,base=None):
         self.base=base
+    def check(self):
+        if re.match("[^@]+@[^@]+\.[^@]+", self.EMAIL.get()):
+            return True
+        else:    
+            return False
 
     def Register(self, event=None):
         self.error_label.place(relx=0.65, y=385,anchor=CENTER)
         if self.USERNAME.get() == "" or self.PASSWORD.get() == "" or self.EMAIL.get() == "" or self.UID.get() == "":
             self.error_label.config(
                 text="Please fill out all fields !!!", fg=colors.error, bg="#ff9966")
-
+        
         else:
-            # user object
-            user_obj = {
-                'username': self.USERNAME.get(),
-                'password': self.PASSWORD.get(),
-                'email': self.EMAIL.get(),
-                'gender': self.GENDER.get(),
-                'group_id': 5000,  
-                'uid': self.UID.get()  # student id
-            }
-            
-            ldap_s = LdapServer(admin_pwd.LDAP_ADMIN_PWD)
-            result = ldap_s.register(user_obj)
-            print(result)
-            if not result:
-                self.HomeWindow()
-                self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)
+            if not self.check():
+                self.error_label.config(
+                text="Invalid Email !!!", fg=colors.error, bg="#ff9966")
             else:
-                self.error_label.config(text=result, fg=colors.error, bg=colors.error_bg)
+                # user object
+                user_obj = {
+                    'username': self.USERNAME.get(),
+                    'password': self.PASSWORD.get(),
+                    'email': self.EMAIL.get(),
+                    'gender': self.GENDER.get(),
+                    'group_id': 5000,  
+                    'uid': self.UID.get()  # student id
+                }
+                
+                ldap_s = LdapServer(admin_pwd.LDAP_ADMIN_PWD)
+                result = ldap_s.register(user_obj)
+                print(result)
+                if not result:
+                    self.HomeWindow()
+                    self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)
+                else:
+                    self.error_label.config(text=result, fg=colors.error, bg=colors.error_bg)
 
     def HomeWindow(self):
         self.root.withdraw()

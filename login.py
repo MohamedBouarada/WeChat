@@ -153,5 +153,5 @@ class LoginPage:
 # self.root.bind("<Configure>", resize_image)
 
 
-s = LoginPage()
-s.main()
+# s = LoginPage()
+# s.main()
