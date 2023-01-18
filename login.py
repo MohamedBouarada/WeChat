@@ -16,10 +16,10 @@ class LoginPage:
             self.error_label.config(
                 text="Please fill out both fields !!!", fg=colors.error, bg="#ff9966")
         else:
-            ldap_s = LdapServer(admin_pwd.LDAP_ADMIN_PWD)
-            result = ldap_s.login(username=self.USERNAME.get(), password=self.PASSWORD.get())
+            ldap_server = LdapServer(admin_pwd.LDAP_ADMIN_PWD)
+            result = ldap_server.login(username=self.USERNAME.get(), password=self.PASSWORD.get())
             if not result:
-                self.HomeWindow()
+                # self.HomeWindow()
                 self.USERNAME.set("")
                 self.PASSWORD.set("")
                 self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)

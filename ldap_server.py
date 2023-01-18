@@ -78,8 +78,8 @@ class LdapServer():
             ('objectClass', [b'inetOrgPerson',
                              b'posixAccount', b'top']),
             ('uid', user['username'].encode("UTF-8")),
-            ('givenname', user['username'].encode("UTF-8")),
-            ('sn', user['username'].encode("UTF-8")),
+            ('givenname', user['firstname'].encode("UTF-8")),
+            ('sn', user['lastname'].encode("UTF-8")),
             ('mail', user['email'].encode("UTF-8")),
             ('uidNumber', user['uid'].encode("UTF-8")),
             ('gidNumber', str(gid).encode("UTF-8")),
@@ -97,14 +97,21 @@ class LdapServer():
         try:
             search_filter = "cn=" + user['username']
             result = ldap_conn.search_s(LDAP_BASE_DN, ldap.SCOPE_SUBTREE, search_filter)
-            # print(result)
+
+            search_filter_uid = "uidNumber=" + user['uid']
+            result_uid = ldap_conn.search_s(LDAP_BASE_DN, ldap.SCOPE_SUBTREE, search_filter_uid)
+
+            print(result_uid)
             # add entry in the directory
-            if not result:
+            if not result and not result_uid:
                 ldap_conn.add_s(dn, entry)
                 return None
-            else:
+            elif result:
                 print("user already exists !!!")
-                return "user already exists !!!"
+                return "userername already used !!!"
+            else:
+                print("N°carte already exists !!!")
+                return "N°carte already used !!!"
             
         finally:
             # disconnect and free memory

@@ -31,7 +31,9 @@ class Signup:
                     'username': self.USERNAME.get(),
                     'password': self.PASSWORD.get(),
                     'email': self.EMAIL.get(),
-                    'gender': self.GENDER.get(),
+                    'firstname': self.FIRSTNAME.get(),
+                    'lastname': self.LASTNAME.get(),
+                    # 'gender': self.GENDER.get(),
                     'group_id': 5000,  
                     'uid': self.UID.get()  # student id
                 }
@@ -40,7 +42,7 @@ class Signup:
                 result = ldap_s.register(user_obj)
                 print(result)
                 if not result:
-                    self.HomeWindow()
+                    # self.HomeWindow()
                     self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)
                 else:
                     self.error_label.config(text=result, fg=colors.error, bg=colors.error_bg)
@@ -93,7 +95,9 @@ class Signup:
         self.PASSWORD = StringVar(self.root)
         self.GENDER = StringVar(self.root)
         self.UID = StringVar(self.root)
-        
+        self.FIRSTNAME=StringVar(self.root)
+        self.LASTNAME=StringVar(self.root)
+
         # backround image
         self.img =Image.open('/home/mohamed/GL4/WeChat/assets/bg2.jpg').resize((700,400))
         self.bg = ImageTk.PhotoImage(self.img)
@@ -108,50 +112,68 @@ class Signup:
 
         # Registration form
         label_signup = Label(self.root,text="SIGNUP",  font=("bold", 20))
-        label_signup.place(relx=0.5, y=100,anchor=CENTER)
+        label_signup.place(relx=0.22, y=100,anchor=CENTER)
         label_signup.config(bg=colors.blue_light, fg=colors.blue_2)
+
+        # self.FirstName label & entry
+        label_firstname = Label(self.root, width=10,text="Firstname :",  font=("bold", 13))
+        label_firstname.place(relx=0.5, y=100,anchor=CENTER)
+        label_firstname.config(bg=colors.blue_light, fg=colors.blue_dark)  
+        
+        input_firstname = Entry(self.root, textvariable=self.FIRSTNAME)
+        input_firstname.place(relx=0.72, y=100,anchor=CENTER)
+        input_firstname.config(bg=colors.input_bg, fg=colors.blue_dark, insertbackground=colors.input_bg)
+
+        # LastName label & entry
+        label_lastname = Label(self.root, width=10,text="Lastname :",  font=("bold", 13))
+        label_lastname.place(relx=0.5, y=140,anchor=CENTER)
+        label_lastname.config(bg=colors.blue_light, fg=colors.blue_dark)
+
+        input_lastname = Entry(self.root, textvariable=self.LASTNAME)
+        input_lastname.place(relx=0.72, y=140,anchor=CENTER)
+        input_lastname.config(bg=colors.input_bg, fg=colors.blue_dark, insertbackground=colors.input_bg)
 
         # UserName label & entry
         label_username = Label(self.root, width=10,text="Username :",  font=("bold", 13))
-        label_username.place(relx=0.5, y=140,anchor=CENTER)
+        label_username.place(relx=0.5, y=180,anchor=CENTER)
         label_username.config(bg=colors.blue_light, fg=colors.blue_dark)
 
         input_username = Entry(self.root, textvariable=self.USERNAME)
-        input_username.place(relx=0.72, y=140,anchor=CENTER)
+        input_username.place(relx=0.72, y=180,anchor=CENTER)
         input_username.config(bg=colors.input_bg, fg=colors.blue_dark, insertbackground=colors.input_bg)
         
 
         # self.EMAIL label & entry
         label_email = Label(self.root, width=10,text="Email :",  font=("bold", 13))
-        label_email.place(relx=0.5, y=180,anchor=CENTER)
+        label_email.place(relx=0.5, y=220,anchor=CENTER)
         label_email.config(bg=colors.blue_light, fg=colors.blue_dark)  
         
         input_email = Entry(self.root, textvariable=self.EMAIL)
-        input_email.place(relx=0.72, y=180,anchor=CENTER)
+        input_email.place(relx=0.72, y=220,anchor=CENTER)
         input_email.config(bg=colors.input_bg, fg=colors.blue_dark, insertbackground=colors.input_bg)
         
 
         # self.PASSWORD label & entry
         label_passwd = Label(self.root,width=10, text="Password :", font=("bold", 13))
-        label_passwd.place(relx=0.5, y=220,anchor=CENTER)
+        label_passwd.place(relx=0.5, y=260,anchor=CENTER)
         label_passwd.config(bg=colors.blue_light, fg=colors.blue_dark)
 
         input_passwd = Entry(self.root, textvariable=self.PASSWORD, show="*")
-        input_passwd.place(relx=0.72, y=220,anchor=CENTER)
+        input_passwd.place(relx=0.72, y=260,anchor=CENTER)
         input_passwd.config(bg=colors.input_bg, fg=colors.blue_dark, insertbackground=colors.input_bg)
         
 
         # self.GENDER label & radio-box
-        label_gender = Label(self.root, width=10,text="Gender :",  font=("bold", 13))
-        label_gender.place(relx=0.5, y=260,anchor=CENTER)
-        label_gender.config(bg=colors.blue_light, fg=colors.blue_dark)
+        # label_gender = Label(self.root, width=10,text="Gender :",  font=("bold", 13))
+        # label_gender.place(relx=0.5, y=260,anchor=CENTER)
+        # label_gender.config(bg=colors.blue_light, fg=colors.blue_dark)
 
-        optionMale = Radiobutton(self.root, text="Male", variable=self.GENDER,value=1)
-        optionMale.place(relx=0.6, y=250)
-        optionFemale = Radiobutton(self.root, text="Female",variable=self.GENDER, value=2)
-        optionFemale.place(relx=0.7, y=250)
-        optionFemale.config(bg=colors.input_bg, fg=colors.blue_dark)
-        optionMale.config(bg=colors.input_bg, fg=colors.blue_dark)
+        # optionMale = Radiobutton(self.root, text="Male", variable=self.GENDER,value=1)
+        # optionMale.place(relx=0.6, y=250)
+        # optionFemale = Radiobutton(self.root, text="Female",variable=self.GENDER, value=2)
+        # optionFemale.place(relx=0.7, y=250)
+        # optionFemale.config(bg=colors.input_bg, fg=colors.blue_dark)
+        # optionMale.config(bg=colors.input_bg, fg=colors.blue_dark)
 
         # Student Id label & entry
         label_StudentId = Label(self.root, width=10,text="Student Id :",  font=("bold", 13))
@@ -162,6 +184,7 @@ class Signup:
         input_StudentId.place(relx=0.72, y=300,anchor=CENTER)
         input_StudentId.config(bg=colors.input_bg, fg=colors.blue_dark, insertbackground=colors.input_bg)
 
+        
 
         # Error label
         self.error_label = Label(self.root,width=30,  font=("bold", 12))
