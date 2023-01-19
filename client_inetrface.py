@@ -196,4 +196,4 @@ class ChatInterface(Frame):
         print("Sending message")
 
 
-t=ChatInterface()
+# t=ChatInterface()

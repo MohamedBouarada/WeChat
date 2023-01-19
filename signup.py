@@ -55,6 +55,7 @@ class Signup:
                     client.connect()
                     client.request_cert()
                     result = handle_cert_local(CA_CLIENT_PATH+self.USERNAME.get()+"_cert.pem")
+                    self.loginPage()
                     self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)
 
                 else:
