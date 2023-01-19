@@ -79,7 +79,7 @@ class LoginPage:
 
         # backround image
         # imgscreen=Toplevel(self.root,bg=colors.login_bg)
-        img =Image.open('/home/mohamed/GL4/WeChat/assets/bg2.jpg').resize((700,400))
+        img =Image.open('./assets/bg2.jpg').resize((700,400))
         bg = ImageTk.PhotoImage(img)
         label = Label(self.root, image=bg )
         label.place(x = 0,y = 0)

@@ -12,7 +12,7 @@ class LdapServer():
     
 
     # admin domain
-    LDAP_ADMIN_DN = "cn=admin,dc=med-bouarada,dc=com"
+    LDAP_ADMIN_DN = "cn=admin,dc=nodomain"
     LDAP_ADMIN_PWD = ""
 
     def __init__(self, admin_pwd):
@@ -24,12 +24,12 @@ class LdapServer():
 
         # organization user domain
         user_dn = "cn=" + self.username +",ou=" + \
-            self.ldap_ou + ",dc=med-bouarada,dc=com"
+            self.ldap_ou + ",dc=nodomain"
 
         print(user_dn)
 
         # base domain
-        LDAP_BASE_DN ="ou=" + self.ldap_ou + ",dc=med-bouarada,dc=com"
+        LDAP_BASE_DN ="ou=" + self.ldap_ou + ",dc=nodomain"
 
         # start connection
         ldap_client = ldap.initialize(self.ldap_server)
@@ -60,7 +60,7 @@ class LdapServer():
 
     def register(self,user):
         # base domain
-        LDAP_BASE_DN = "ou=" + self.ldap_ou + ",dc=med-bouarada,dc=com"
+        LDAP_BASE_DN = "ou=" + self.ldap_ou + ",dc=nodomain"
         # home directory
         HOME_DIRECTORY = "/home/users"
 
