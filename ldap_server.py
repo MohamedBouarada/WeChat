@@ -4,15 +4,15 @@ from base64 import b64encode
 from dotenv.main import load_dotenv
 import os
 #cn or uid
-
+load_dotenv()
 class LdapServer():
 
     ldap_server = "ldap://localhost:389"  # host address
     ldap_ou = "People"  # organization unit
-    
+    ldap_dc=os.environ['LDAP_DC']
 
     # admin domain
-    LDAP_ADMIN_DN = "cn=admin,dc=nodomain"
+    LDAP_ADMIN_DN = "cn=admin"+ldap_dc
     LDAP_ADMIN_PWD = ""
 
     def __init__(self, admin_pwd):
@@ -24,12 +24,12 @@ class LdapServer():
 
         # organization user domain
         user_dn = "cn=" + self.username +",ou=" + \
-            self.ldap_ou + ",dc=nodomain"
+            self.ldap_ou + self.ldap_dc
 
         print(user_dn)
 
         # base domain
-        LDAP_BASE_DN ="ou=" + self.ldap_ou + ",dc=nodomain"
+        LDAP_BASE_DN ="ou=" + self.ldap_ou + self.ldap_dc
 
         # start connection
         ldap_client = ldap.initialize(self.ldap_server)
@@ -60,7 +60,7 @@ class LdapServer():
 
     def register(self,user):
         # base domain
-        LDAP_BASE_DN = "ou=" + self.ldap_ou + ",dc=nodomain"
+        LDAP_BASE_DN = "ou=" + self.ldap_ou + self.ldap_dc
         # home directory
         HOME_DIRECTORY = "/home/users"
 
@@ -120,10 +120,11 @@ class LdapServer():
 
 
 # enter admin password
-load_dotenv()
+
 # pwd=os.environ.get('ADMIN_PWD')
 # print(pwd)
 s = LdapServer(admin_pwd=os.environ['ADMIN_PWD'])
+
 # Test :
 # test login
 # s.login(username="bo3", password="1234")
