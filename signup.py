@@ -5,6 +5,14 @@ import admin_pwd
 import colors
 from PIL import ImageTk, Image  
 import re
+from certificate_authority.ca_client import CaClient , handle_cert_local
+
+from dotenv.main import load_dotenv
+import os
+
+load_dotenv()
+
+CA_CLIENT_PATH=os.environ['CA_CLIENT_CERT_DIR']
 
 class Signup:
     def __init__(self,base=None):
@@ -43,7 +51,13 @@ class Signup:
                 print(result)
                 if not result:
                     # self.HomeWindow()
+                    client = CaClient(self.USERNAME)
+                    client.connect()
+                    client.request_cert()
+                    result = handle_cert_local(CA_CLIENT_PATH+self.USERNAME.get()+"_cert.pem")
+                    self.loginPage()
                     self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)
+
                 else:
                     self.error_label.config(text=result, fg=colors.error, bg=colors.error_bg)
 
@@ -99,7 +113,7 @@ class Signup:
         self.LASTNAME=StringVar(self.root)
 
         # backround image
-        self.img =Image.open('/home/mohamed/GL4/WeChat/assets/bg2.jpg').resize((700,400))
+        self.img =Image.open('./assets/bg2.jpg').resize((700,400))
         self.bg = ImageTk.PhotoImage(self.img)
         label = Label(self.root, image=self.bg )
         label.place(x = 0,y = 0)

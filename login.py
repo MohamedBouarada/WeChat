@@ -4,6 +4,16 @@ from ldap_server import LdapServer
 import admin_pwd
 import colors
 from PIL import ImageTk, Image  
+from certificate_authority.ca_client import CaClient ,handle_cert_local
+
+from dotenv.main import load_dotenv
+import os
+
+load_dotenv()
+
+CA_CLIENT_CERT_DIR=os.environ['CA_CLIENT_CERT_DIR']
+
+
 
 class LoginPage:
     # visit=False
@@ -20,9 +30,24 @@ class LoginPage:
             result = ldap_server.login(username=self.USERNAME.get(), password=self.PASSWORD.get())
             if not result:
                 # self.HomeWindow()
-                self.USERNAME.set("")
-                self.PASSWORD.set("")
-                self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)
+                handle_local = handle_cert_local(CA_CLIENT_CERT_DIR+self.USERNAME.get()+"_cert.pem")
+                if not handle_local:
+                    self.error_label.config(text="no cert found, signup", fg=colors.error, bg=colors.error_bg)
+                else:
+
+                    client = CaClient(self.USERNAME)
+                    client.connect()
+                    client.verify_cert()
+                    if client.cert_is_ok == "Ok":
+                        self.USERNAME.set("")
+                        self.PASSWORD.set("")
+                        self.clientInterface()
+                    else:
+                        self.error_label.config(
+                            text="Access denied -- Pirate Alert --", fg=colors.error, bg=colors.error_bg)
+
+                
+                #self.error_label.config(text="Sucess", fg=colors.success, bg=colors.success_bg)
 
             else:
                 self.error_label.config(text=result, fg=colors.error, bg=colors.error_bg)
@@ -52,6 +77,15 @@ class LoginPage:
         login = Signup()
         # self.root.destroy()
         login.main()
+    
+    def clientInterface(self):
+        self.root.withdraw()
+        self.root.destroy()
+        
+        from client_inetrface import ChatInterface
+        
+        # self.root.destroy()
+        t=ChatInterface()
 
     def Back(self):
         Home.destroy()
@@ -79,7 +113,7 @@ class LoginPage:
 
         # backround image
         # imgscreen=Toplevel(self.root,bg=colors.login_bg)
-        img =Image.open('/home/mohamed/GL4/WeChat/assets/bg2.jpg').resize((700,400))
+        img =Image.open('./assets/bg2.jpg').resize((700,400))
         bg = ImageTk.PhotoImage(img)
         label = Label(self.root, image=bg )
         label.place(x = 0,y = 0)
