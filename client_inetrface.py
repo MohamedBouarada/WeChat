@@ -9,6 +9,8 @@ from controller_message_format import ControllerMessageFormat
 from receiver import Receiver, ReceiverRabbitMqConfigure
 
 from sender import Sender, SenderRabbitmqConfigure
+from rsa_handler import rsa_decrypt , rsa_encrypt
+import base64
 
 # network client
 client = None
@@ -198,6 +200,12 @@ class ChatInterface(Frame):
     def receive_message_from_controller(self, c):
         def callback(ch, method, properties, body):
             print("new connection", body)
+            message = ControllerMessageFormat()
+            message.convertToJson(body.decode())
+            if message.action == "joined":
+                print('d5alt joiiiiiindedddd')
+                self.users_in_room=message.data['users_in_room']
+                
             # ch.basic_ack(delivery_tag=method.delivery_tag)
         while True:
             print("in loop")
@@ -264,6 +272,34 @@ class ChatInterface(Frame):
 
             self.tkDisplay.config(state=tk.DISABLED)
             self.tkDisplay.see(tk.END)
+
+        elif action=='onMessageSend':
+            msgArray = data['data']
+            print('ARAAAAAAAAAAAAAAAAAAAAAAAAy' , msgArray)
+            encrypted_msg=''
+            for element in msgArray:
+                if element['username'] == self.username:
+                    #encrypted_msg = base64.b64encode(element['message'].encode())
+                    print('woooooooohoooooooo' , encrypted_msg)
+                    encrypted_msg=element['message']
+                    break
+                    #encrypted_msg = str.encode(encrypted_msg)
+                    #encrypted_msg = base64.b64encode(encrypted_msg)
+
+            if len(encrypted_msg)>0:
+                decrypted_msg = rsa_decrypt(encrypted_message=encrypted_msg , receiver_username=self.username)
+                print("yalaaaaaaaaaaaaaaaaaaaaaaaa" , decrypted_msg)
+                texts = self.tkDisplay.get("1.0", tk.END).strip()
+                self.tkDisplay.config(state=tk.NORMAL)
+                if len(texts) < 1:
+                    self.tkDisplay.insert(tk.END,decrypted_msg.decode())
+                else:
+                    self.tkDisplay.insert(tk.END, "\n\n"+decrypted_msg.decode())
+
+                self.tkDisplay.config(state=tk.DISABLED)
+                self.tkDisplay.see(tk.END)
+
+
         # if action == "connected":
         #     self.connected_users=data["connected_users"]
         #     self.rooms=data['rooms']
@@ -271,15 +307,33 @@ class ChatInterface(Frame):
 
             
         # elif action == "joined":
-        #     self.users_in_room=data['users_in_room']
+        #      self.users_in_room=data['users_in_room']
+        #      print(self.users_in_room,'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM')
            
 
     def getChatMessage(self, msg):
 
         msg = msg.replace('\n', '')
         texts = self.tkDisplay.get("1.0", tk.END).strip()
+        data=[]
+        for user in self.users_in_room:
+            if(user != self.username):
+                encrypted = rsa_encrypt(message=msg,receiver_username=user)
+                print('level111111111' , encrypted)
+                decodedMsg = base64.b64decode(encrypted)
+                #decodedMsg.decode('utf-16')
+                decodedMsg= encrypted.decode('utf-8','strict')
+
+                data.append({
+                    'username':user,
+                    'message':decodedMsg
+                })
+        message = ControllerMessageFormat(action='onMessageSend',data={
+          'data':data   
+        })
+        message.convertToString()
         
-        self.sender.send_message(msg=msg)
+        self.sender.send_message(msg=message.msg)
         # enable the display area and insert the text and then disable.
         # why? Apparently, tkinter does not allow use insert into a disabled Text widget :(
         self.tkDisplay.config(state=tk.NORMAL)
