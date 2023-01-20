@@ -35,10 +35,11 @@ class Controller:
         self.channel.basic_qos(prefetch_count=0)
         self.channel.start_consuming()
 
-    def send(self,msg,routing_key=''):
-        self.channel.exchange_declare(exchange='controller_exchange', exchange_type='fanout')
+    def send(self,msg,routing_key='',exchange='controller_exchange'):
+        print('afteeeeeeeeeeeeeer room',exchange)
+        self.channel.exchange_declare(exchange=exchange, exchange_type='fanout')
         self.channel.basic_publish(
-            exchange='controller_exchange',
+            exchange=exchange,
             routing_key=routing_key,
             body=msg,
             # properties=pika.BasicProperties(
@@ -46,6 +47,8 @@ class Controller:
             # )
             )
     
+
+
     def handleAction(self, action, data):
         if action == "onNewConnection":
             # data={username}
@@ -56,8 +59,22 @@ class Controller:
             message.convertToString()
             # self.send(message.msg,routing_key='global_receiver')
             self.send(message.msg)
-
-
+        elif action == "onRoomEnter":
+            # data={username,room}
+            self.rooms[data['room']].append(data['username']) 
+            message = ControllerMessageFormat(
+                "joined", {"users_in_room": self.rooms[data['room']]})   
+            message.convertToString()
+            print('beforeeeee room',data['room'])
+            self.send(msg=message.msg)
+        elif action == "onRoomLeave":
+            # data={username,room}
+            self.rooms[data['room']].remove(data['username']) 
+            message = ControllerMessageFormat(
+                "left", {"users_in_room": self.rooms[data['room']],"user_left":data['username']})   
+            message.convertToString()
+            self.send(msg=message.msg,exchange=data['room'])
+    
 
 c=Controller()
 c.connectToRabbitmq()

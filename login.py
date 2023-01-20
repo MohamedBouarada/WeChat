@@ -41,7 +41,7 @@ class LoginPage:
                     if client.cert_is_ok == "Ok":
                         # self.USERNAME.set("")
                         # self.PASSWORD.set("")
-                        self.clientInterface()
+                        self.welcome()
                     else:
                         self.error_label.config(
                             text="Access denied -- Pirate Alert --", fg=colors.error, bg=colors.error_bg)
@@ -78,6 +78,12 @@ class LoginPage:
         # self.root.destroy()
         login.main()
     
+    def welcome(self):
+        self.root.withdraw()
+        self.root.destroy()
+        from welcome import Welcome
+        w=Welcome(username=self.USERNAME.get())
+
     def clientInterface(self):
         
         self.root.withdraw()

@@ -1,5 +1,8 @@
 import tkinter as tk
-from tkinter import Frame, messagebox
+from tkinter import *
+
+import colors
+from tkinter import Button, Frame, messagebox
 import socket
 import threading
 from controller_message_format import ControllerMessageFormat
@@ -14,17 +17,24 @@ HOST_PORT = 8080
 
 
 class ChatInterface(Frame):
-    def __init__(self, master=None, username=''):
+    def __init__(self, master=None, username='',num_room='',users_in_room=[]):
+        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         self.window = tk.Tk()
+        
         self.window.title("Client")
         self.username = username
-        
+
+        self.connected_users = []
+        self.rooms = {'room1': [], 'room2': [], 'room3': [], 'room4': []}
+        self.users_in_room=users_in_room  
+        self.num_room=num_room
+
         server = SenderRabbitmqConfigure(queue='hello',
                                          host='localhost',
                                          routingKey='hello',
-                                         exchange='room1')
+                                         exchange=self.num_room)
         serverconfigure = ReceiverRabbitMqConfigure(host='localhost',
-                                                    queue='', exchange='room1')
+                                                    queue='', exchange=self.num_room)
         self.sender = Sender(server)
         self.sender.connect()
         self.receiver = Receiver(config=serverconfigure)
@@ -66,6 +76,19 @@ class ChatInterface(Frame):
         # self.btnConnect = tk.Button(self.topFrame, text="Connect", command=lambda : self.connect())
         # self.btnConnect.pack(side=tk.LEFT)
         # btnConnect.bind('<Button-1>', connect)
+        self.btnlogin = Button(self.window, text='Room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
+        self.btnlogin.place(relx=0, y=2,anchor=CENTER)
+
+        self.btnlogin.bind('<Return>',(lambda event: self.enterRoom(room="room1")))
+        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+
+        # Submit button
+        self.btnlogin = Button(self.window, text='Room2', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom("room1"))
+        self.btnlogin.place(relx=0.5, y=2,anchor=CENTER)
+
+        self.btnlogin.bind('<Return>',(lambda event: self.leaveRoom(room="room1")))
+        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+
         self.topFrame.pack(side=tk.TOP)
 
         self.displayFrame = tk.Frame(self.window)
@@ -89,6 +112,22 @@ class ChatInterface(Frame):
             self.tkMessage.get("1.0", tk.END))))
         self.bottomFrame.pack(side=tk.BOTTOM)
         self.window.mainloop()
+
+
+
+    def enterRoom(self,room):
+        message = ControllerMessageFormat(
+            "onRoomEnter", {"username": self.username,"room":room})
+
+        message.convertToString()
+        self.controller_sender.send_message(message.msg)
+
+    def leaveRoom(self,room):
+        message = ControllerMessageFormat(
+            "onRoomLeave", {"username": self.username,"room":room})
+
+        message.convertToString()
+        self.controller_sender.send_message(message.msg)    
 
     def connect(self):
         global client
@@ -166,6 +205,10 @@ class ChatInterface(Frame):
         self.msg = ''
 
         def callback(ch, method, properties, body):
+            message = ControllerMessageFormat()
+            message.convertToJson(body.decode())
+            self.handleAction(message.action, message.data)
+
             print('in', body)
             self.msg = body
             # ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -206,11 +249,34 @@ class ChatInterface(Frame):
         # sck.close()
         # self.window.destroy()
 
+    def handleAction(self,action,data):
+        if action == "left":
+            user_left=data['user_left']
+
+            texts = self.tkDisplay.get("1.0", tk.END).strip()
+            self.tkDisplay.config(state=tk.NORMAL)
+            if len(texts) < 1:
+                self.tkDisplay.insert(tk.END, user_left.decode())
+            else:
+                self.tkDisplay.insert(tk.END, "\n\n"+user_left.decode())
+
+            self.tkDisplay.config(state=tk.DISABLED)
+            self.tkDisplay.see(tk.END)
+        # if action == "connected":
+        #     self.connected_users=data["connected_users"]
+        #     self.rooms=data['rooms']
+        #     #todo later
+
+            
+        # elif action == "joined":
+        #     self.users_in_room=data['users_in_room']
+           
+
     def getChatMessage(self, msg):
 
         msg = msg.replace('\n', '')
         texts = self.tkDisplay.get("1.0", tk.END).strip()
-
+        
         self.sender.send_message(msg=msg)
         # enable the display area and insert the text and then disable.
         # why? Apparently, tkinter does not allow use insert into a disabled Text widget :(
