@@ -133,6 +133,7 @@ class Welcome:
             print("new connection", body)
             message = ControllerMessageFormat()
             message.convertToJson(body.decode())
+            print('actionnnnn:::::::',message.action,':::::::::',message.data)
             self.handleAction(message.action, message.data)
             # ch.basic_ack(delivery_tag=method.delivery_tag)
         while True:
@@ -184,7 +185,7 @@ class Welcome:
     def clientInterface(self):
         print("d5altttttttttttttttttttttttttt")
         self.root.withdraw()
-        self.root.destroy()
+        # self.root.destroy()
         from client_inetrface import ChatInterface
         
         # self.root.destroy()

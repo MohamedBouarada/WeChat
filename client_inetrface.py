@@ -76,17 +76,18 @@ class ChatInterface(Frame):
         # self.btnConnect = tk.Button(self.topFrame, text="Connect", command=lambda : self.connect())
         # self.btnConnect.pack(side=tk.LEFT)
         # btnConnect.bind('<Button-1>', connect)
-        self.btnlogin = Button(self.window, text='Room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
-        self.btnlogin.place(relx=0, y=2,anchor=CENTER)
+        # self.btnlogin = Button(self.window, text='Room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
+        # self.btnlogin.place(relx=0, y=2,anchor=CENTER)
 
-        self.btnlogin.bind('<Return>',(lambda event: self.enterRoom(room="room1")))
-        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        # self.btnlogin.bind('<Return>',(lambda event: self.enterRoom(room="room1")))
+        # self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
-        # Submit button
-        self.btnlogin = Button(self.window, text='Room2', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom("room1"))
-        self.btnlogin.place(relx=0.5, y=2,anchor=CENTER)
+        # leave button
+        self.btnlogin = Button(self.topFrame, text='Leave Room', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom())
+        # self.btnlogin.place(relx=0.5, y=102,anchor=CENTER)
+        self.btnlogin.pack(side=tk.LEFT)
 
-        self.btnlogin.bind('<Return>',(lambda event: self.leaveRoom(room="room1")))
+        self.btnlogin.bind('<Return>',(lambda event: self.leaveRoom()))
         self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
         self.topFrame.pack(side=tk.TOP)
@@ -115,19 +116,20 @@ class ChatInterface(Frame):
 
 
 
-    def enterRoom(self,room):
+    # def enterRoom(self,room):
+    #     message = ControllerMessageFormat(
+    #         "onRoomEnter", {"username": self.username,"room":room})
+
+    #     message.convertToString()
+    #     self.controller_sender.send_message(message.msg)
+
+    def leaveRoom(self):
         message = ControllerMessageFormat(
-            "onRoomEnter", {"username": self.username,"room":room})
+            "onRoomLeave", {"username": self.username,"room":self.num_room})
 
         message.convertToString()
         self.controller_sender.send_message(message.msg)
-
-    def leaveRoom(self,room):
-        message = ControllerMessageFormat(
-            "onRoomLeave", {"username": self.username,"room":room})
-
-        message.convertToString()
-        self.controller_sender.send_message(message.msg)    
+        self.welcome()    
 
     def connect(self):
         global client
@@ -256,9 +258,9 @@ class ChatInterface(Frame):
             texts = self.tkDisplay.get("1.0", tk.END).strip()
             self.tkDisplay.config(state=tk.NORMAL)
             if len(texts) < 1:
-                self.tkDisplay.insert(tk.END, user_left.decode())
+                self.tkDisplay.insert(tk.END, user_left)
             else:
-                self.tkDisplay.insert(tk.END, "\n\n"+user_left.decode())
+                self.tkDisplay.insert(tk.END, "\n\n"+user_left)
 
             self.tkDisplay.config(state=tk.DISABLED)
             self.tkDisplay.see(tk.END)
@@ -302,6 +304,12 @@ class ChatInterface(Frame):
             client.close()
             self.window.destroy()
         print("Sending message")
+
+    def welcome(self):
+        self.window.withdraw()
+        # self.window.destroy()
+        from welcome import Welcome
+        w=Welcome(username=self.username)
 
 
 # t=ChatInterface()
