@@ -3,13 +3,14 @@ from threading import Thread
 
 class ReceiverRabbitMqConfigure():
 
-    def __init__(self, host='localhost', queue='hello',exchange=''):
+    def __init__(self, host='localhost', queue='',exchange='',exchange_type='fanout',exclusive=True):
 
         """ Server initialization   """
         self.host = host
         self.queue = queue
         self.exchange=exchange
-
+        self.exchange_type=exchange_type
+        self.exclusive=exclusive
 class Receiver():
     def __init__(self,config, user=None):
         self.user = user
@@ -22,15 +23,14 @@ class Receiver():
 
         self.channel = self.connection.channel()
         self.channel.exchange_declare(
-            exchange=self.config.exchange, exchange_type='fanout')
-        result = self.channel.queue_declare(queue='', exclusive=True)
+            exchange=self.config.exchange, exchange_type=self.config.exchange_type)
+        result = self.channel.queue_declare(queue=self.config.queue, exclusive=self.config.exclusive)
 
         self.queue_name = result.method.queue
         self.channel.queue_bind(exchange=self.config.exchange, queue=self.queue_name)
         print('ready to receive msg')
 
     def listen_channel(self, cb):
-        print('listeeen   nayek')
         self.channel.basic_consume(queue=self.queue_name, on_message_callback=cb, auto_ack=True)
         print('call')
         self.channel.basic_qos(prefetch_count=0)

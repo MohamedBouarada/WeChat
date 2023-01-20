@@ -39,8 +39,8 @@ class LoginPage:
                     client.connect()
                     client.verify_cert()
                     if client.cert_is_ok == "Ok":
-                        self.USERNAME.set("")
-                        self.PASSWORD.set("")
+                        # self.USERNAME.set("")
+                        # self.PASSWORD.set("")
                         self.clientInterface()
                     else:
                         self.error_label.config(
@@ -79,13 +79,15 @@ class LoginPage:
         login.main()
     
     def clientInterface(self):
+        
         self.root.withdraw()
         self.root.destroy()
-        
         from client_inetrface import ChatInterface
         
         # self.root.destroy()
-        t=ChatInterface()
+        t=ChatInterface(username=self.USERNAME.get())
+        
+        # t.connect()
 
     def Back(self):
         Home.destroy()
