@@ -40,47 +40,69 @@ class Welcome:
         self.controller_sender.connect()
         
 
-        self.connect()
-        self.main()
+       
         message = ControllerMessageFormat(
             "onNewConnection", {"username": self.username})
 
         message.convertToString()
         self.controller_sender.send_message(message.msg)
+        print('done')   
+        self.connect()
+        self.main()
 
     def main(self):
         
         self.root=Toplevel()  
         self.root.geometry('700x400')
-        self.root.title("Login Form")
+        self.root.title("Welcome Home !")
         self.root.config(bg=colors.login_bg)
 
-        # Submit button
-        self.btnlogin = Button(self.root, text='room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
-        self.btnlogin.place(relx=0.7, y=100,anchor=CENTER)
+        self.connected_users_label = Label(self.root,text='Connected Users',bg=colors.login_bg,fg=colors.blue_dark)
+        self.connected_users_label.place(relx=0.7,y=50,anchor=CENTER)
+        #self.connected_users_label.pack()
 
-        self.btnlogin.bind('<Return>', (lambda event: self.enterRoom(room="room1")))
-        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        self.rooms_label=Label(self.root,text='Rooms',bg=colors.login_bg,fg=colors.blue_dark)
+        self.rooms_label.place(relx=0.2,y=50,anchor=CENTER)
+        #self.rooms_label.pack()
 
-        # Submit button
-        self.btnlogin = Button(self.root, text='room2', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room2"))
-        self.btnlogin.place(relx=0.7, y=150,anchor=CENTER)
+        self.connected_users_listbox= Listbox(self.root,bg=colors.login_bg ,fg=colors.blue_dark)
 
-        self.btnlogin.bind('<Return>', (lambda event: self.enterRoom(room="room2")))
-        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        
+        
+        self.connected_users_listbox.place(relx=0.7,rely=0.5,anchor=CENTER)
+        for user in self.connected_users :
+                self.connected_users_listbox.insert(END,user)
+        # room1
+        self.room1 = Button(self.root, text='room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
+        self.room1.place(relx=0.2, y=100,anchor=CENTER)
 
-        self.btnlogin = Button(self.root, text='room3', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room3"))
-        self.btnlogin.place(relx=0.7, y=250,anchor=CENTER)
+        self.room1.bind('<Return>', (lambda event: self.enterRoom(room="room1")))
+        self.room1.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
-        self.btnlogin.bind('<Return>', (lambda event: self.enterRoom(room="room3")))
-        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        # room2
+        self.room2 = Button(self.root, text='room2', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room2"))
+        self.room2.place(relx=0.2, y=150,anchor=CENTER)
 
-        # Submit button
-        self.btnlogin = Button(self.root, text='room4', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room4"))
-        self.btnlogin.place(relx=0.7, y=300,anchor=CENTER)
+        self.room2.bind('<Return>', (lambda event: self.enterRoom(room="room2")))
+        self.room2.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
-        self.btnlogin.bind('<Return>',(lambda event: self.enterRoom(room="room4")))
-        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        #room3
+        self.room3 = Button(self.root, text='room3', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room3"))
+        self.room3.place(relx=0.2, y=200,anchor=CENTER)
+
+        self.room3.bind('<Return>', (lambda event: self.enterRoom(room="room3")))
+        self.room3.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+
+        # room4
+        self.room4 = Button(self.root, text='room4', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room4"))
+        self.room4.place(relx=0.2, y=250,anchor=CENTER)
+
+        self.room4.bind('<Return>',(lambda event: self.enterRoom(room="room4")))
+        self.room4.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+
+        self.quitButton= Button(self.root,text='Quit' , width=15 , bg=colors.error_bg,command= lambda: self.quit())
+        self.quitButton.place(relx=0.5,rely=0.9,anchor=CENTER)
+        self.quitButton.bind('<Return>', (lambda event: self.quit()))
 
         # it is use for display the registration form on the window
         self.root.resizable(0, 0)
@@ -103,7 +125,7 @@ class Welcome:
             "onRoomLeave", {"username": self.username,"room":room})
 
         message.convertToString()
-        self.controller_sender.send_message(message.msg)    
+        self.controller_sender.send_message(message.msg) 
 
     def connect(self):
         global client
@@ -174,7 +196,9 @@ class Welcome:
         if action == "connected":
             self.connected_users=data["connected_users"]
             self.rooms=data['rooms']
-            #todo later
+            self.connected_users_listbox.delete(0,tk.END)
+            for user in self.connected_users :
+                self.connected_users_listbox.insert(END,user)
 
             
         elif action == "joined":
@@ -182,6 +206,11 @@ class Welcome:
             self.users_in_room=data['users_in_room']
             if data['current']==self.username:
                 self.clientInterface()
+        elif action == 'quitted':
+            self.connected_users=data['connected_users']
+            self.connected_users_listbox.delete(0,tk.END)
+            for user in self.connected_users :
+                self.connected_users_listbox.insert(END,user)
 
     def clientInterface(self):
         print("d5altttttttttttttttttttttttttt")
@@ -201,3 +230,12 @@ class Welcome:
         # self.root.destroy()
         t=HomePage()
         t.main()
+    
+    def quit(self):
+        message = ControllerMessageFormat(
+            "onQuit", {"username": self.username})
+
+        message.convertToString()
+        self.controller_sender.send_message(message.msg)
+        self.root.withdraw()
+        self.root.destroy()
