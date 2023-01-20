@@ -21,6 +21,11 @@ class Welcome:
         self.users_in_room=[]  
         self.num_room=''
         self.username = username
+
+        self.root=Toplevel()  
+        self.root.geometry('700x400')
+        self.root.title("Welcome Home !")
+        self.root.config(bg=colors.login_bg)
         
         controller_receiver_config = ReceiverRabbitMqConfigure(host='localhost',
                                                                queue='', 
@@ -40,7 +45,23 @@ class Welcome:
         self.controller_sender.connect()
         
 
-       
+        self.connected_users_listbox= Listbox(self.root,bg=colors.login_bg ,fg=colors.blue_dark)
+
+        
+        
+        self.connected_users_listbox.place(relx=0.7,rely=0.5,anchor=CENTER)
+
+
+        for user in self.connected_users :
+                
+            if(user == self.username):
+                self.connected_users_listbox.insert(END,user+' (YOU)')
+                self.connected_users_listbox.itemconfig(END,{'fg':colors.login_bg})
+                self.connected_users_listbox.itemconfig(END,{'bg':colors.blue_dark})
+            else:
+                self.connected_users_listbox.insert(END,user)
+
+
         message = ControllerMessageFormat(
             "onNewConnection", {"username": self.username})
 
@@ -52,10 +73,7 @@ class Welcome:
 
     def main(self):
         
-        self.root=Toplevel()  
-        self.root.geometry('700x400')
-        self.root.title("Welcome Home !")
-        self.root.config(bg=colors.login_bg)
+        
 
         self.connected_users_label = Label(self.root,text='Connected Users',bg=colors.login_bg,fg=colors.blue_dark)
         self.connected_users_label.place(relx=0.7,y=50,anchor=CENTER)
@@ -65,13 +83,7 @@ class Welcome:
         self.rooms_label.place(relx=0.2,y=50,anchor=CENTER)
         #self.rooms_label.pack()
 
-        self.connected_users_listbox= Listbox(self.root,bg=colors.login_bg ,fg=colors.blue_dark)
-
         
-        
-        self.connected_users_listbox.place(relx=0.7,rely=0.5,anchor=CENTER)
-        for user in self.connected_users :
-                self.connected_users_listbox.insert(END,user)
         # room1
         self.room1 = Button(self.root, text='room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
         self.room1.place(relx=0.2, y=100,anchor=CENTER)
@@ -196,9 +208,15 @@ class Welcome:
         if action == "connected":
             self.connected_users=data["connected_users"]
             self.rooms=data['rooms']
+
             self.connected_users_listbox.delete(0,tk.END)
             for user in self.connected_users :
-                self.connected_users_listbox.insert(END,user)
+                if(user == self.username):
+                    self.connected_users_listbox.insert(END,user+' (YOU)')
+                    self.connected_users_listbox.itemconfig(END,{'fg':colors.login_bg})
+                    self.connected_users_listbox.itemconfig(END,{'bg':colors.blue_dark})
+                else:
+                    self.connected_users_listbox.insert(END,user)
 
             
         elif action == "joined":
@@ -210,7 +228,12 @@ class Welcome:
             self.connected_users=data['connected_users']
             self.connected_users_listbox.delete(0,tk.END)
             for user in self.connected_users :
-                self.connected_users_listbox.insert(END,user)
+                if(user == self.username):
+                    self.connected_users_listbox.insert(END,user+' (YOU)')
+                    self.connected_users_listbox.itemconfig(END,{'fg':colors.login_bg})
+                    self.connected_users_listbox.itemconfig(END,{'bg':colors.blue_dark})
+                else:
+                    self.connected_users_listbox.insert(END,user)
 
     def clientInterface(self):
         print("d5altttttttttttttttttttttttttt")
