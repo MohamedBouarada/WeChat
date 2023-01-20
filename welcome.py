@@ -173,6 +173,7 @@ class Welcome:
     def handleAction(self,action,data):
         if action == "connected":
             self.connected_users=data["connected_users"]
+            print("aAAAAAAAAAHLAAAAAAAAAAAAAAAAAAAAAA")
             self.rooms=data['rooms']
             #todo later
 
