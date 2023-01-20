@@ -73,6 +73,13 @@ class Controller:
                 "left", {"users_in_room": self.rooms[data['room']],"user_left":data['username']})   
             message.convertToString()
             self.send(msg=message.msg,exchange=data['room'])
+        elif action =='onQuit':
+            self.connected_users.remove(data['username'])
+            message = ControllerMessageFormat(
+                "quitted", {"connected_users": self.connected_users})
+            message.convertToString()
+            # self.send(message.msg,routing_key='global_receiver')
+            self.send(message.msg)
     
 
 c=Controller()
