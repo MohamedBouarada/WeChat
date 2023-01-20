@@ -23,7 +23,7 @@ class ChatInterface(Frame):
         print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         self.window = tk.Tk()
         
-        self.window.title("Client")
+        # self.window.title("Client")
         self.username = username
 
         self.connected_users = []
@@ -69,51 +69,102 @@ class ChatInterface(Frame):
 
         
 
+        self.window.geometry('800x500')
+        self.window.title("WeChat")
+        self.window.config(background=colors.blue_dark)
 
+        # self.topFrame = tk.Frame(self.window)
+        # # self.lblName = tk.Label(self.topFrame, text = "Name:").pack(side=tk.LEFT)
+        # # self.entName = tk.Entry(self.topFrame)
+        # # self.entName.pack(side=tk.LEFT)
+        # # self.btnConnect = tk.Button(self.topFrame, text="Connect", command=lambda : self.connect())
+        # # self.btnConnect.pack(side=tk.LEFT)
+        # # btnConnect.bind('<Button-1>', connect)
+        # # self.btnlogin = Button(self.window, text='Room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
+        # # self.btnlogin.place(relx=0, y=2,anchor=CENTER)
 
-        self.topFrame = tk.Frame(self.window)
-        # self.lblName = tk.Label(self.topFrame, text = "Name:").pack(side=tk.LEFT)
-        # self.entName = tk.Entry(self.topFrame)
-        # self.entName.pack(side=tk.LEFT)
-        # self.btnConnect = tk.Button(self.topFrame, text="Connect", command=lambda : self.connect())
-        # self.btnConnect.pack(side=tk.LEFT)
-        # btnConnect.bind('<Button-1>', connect)
-        # self.btnlogin = Button(self.window, text='Room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
-        # self.btnlogin.place(relx=0, y=2,anchor=CENTER)
+        # # self.btnlogin.bind('<Return>',(lambda event: self.enterRoom(room="room1")))
+        # # self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
-        # self.btnlogin.bind('<Return>',(lambda event: self.enterRoom(room="room1")))
+        # # leave button
+        # self.btnlogin = Button(self.topFrame, text='Leave Room', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom())
+        # # self.btnlogin.place(relx=0.5, y=102,anchor=CENTER)
+        # self.btnlogin.pack(side=tk.LEFT)
+
+        # self.btnlogin.bind('<Return>',(lambda event: self.leaveRoom()))
         # self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
-        # leave button
-        self.btnlogin = Button(self.topFrame, text='Leave Room', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom())
-        # self.btnlogin.place(relx=0.5, y=102,anchor=CENTER)
-        self.btnlogin.pack(side=tk.LEFT)
+        # self.topFrame.pack(side=tk.TOP)
 
-        self.btnlogin.bind('<Return>',(lambda event: self.leaveRoom()))
-        self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        # self.clientFrame = tk.Frame(self.window)
+        # self.lblLine = tk.Label(self.clientFrame, text="**********Client List**********").pack()
+        # self.scrollBar = tk.Scrollbar(self.clientFrame)
+        # self.scrollBar.pack(side=tk.RIGHT, fill=tk.Y)
+        # self.tkDisplay = tk.Text(self.clientFrame, height=15, width=30)
+        # self.tkDisplay.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 0))
+        # self.scrollBar.config(command=self.tkDisplay.yview)
+        # self.tkDisplay.config(yscrollcommand=self.scrollBar.set, background="#F4F6F7", highlightbackground="grey", state="disabled")
+        # self.clientFrame.pack(side=tk.BOTTOM, pady=(5, 10))
 
-        self.topFrame.pack(side=tk.TOP)
 
-        self.displayFrame = tk.Frame(self.window)
+
+
+
+        self.leftFrame = tk.Frame(self.window,background="white" )
+        self.listTitle=Label(self.leftFrame, text="Chat List",font=('times new roman', 20))
+        self.listTitle.config(fg="white",bg=colors.success_bg,width=15)
+        self.listTitle.pack()
+        self.liste = Listbox(self.leftFrame,width=25,height=22, bg='white',fg=colors.blue_1)
+        self.liste.delete(0,END)
+        for user in self.users_in_room:
+            self.liste.insert(END,user)
+        # self.liste.insert(1, "Mohamed","aaaaaaaaaaaaaaaaaa")
+        # self.liste.insert(2, "Racem")
+        # self.liste.insert(3, "La7nach")
+        # self.liste.insert(4, "Zaaaab")
+        # self.liste.insert(5, "3asba")
+    
+        self.liste.pack()
+
+        self.leaveBtn = Button(self.leftFrame, text='Leave Room',width=10 ,font=('bold', 15), bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom())
+        # self.leaveBtn.place(relx=0.5, y=102,anchor=CENTER)
+        self.leaveBtn.pack(padx=(1, 1),pady=(1, 1))
+
+        self.leaveBtn.bind('<Return>',(lambda event: self.leaveRoom()))
+        self.leaveBtn.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.red, activeforeground=colors.blue_dark)
+
+        self.leftFrame.pack(side=tk.LEFT ,padx=(20, 20),pady=(20,20))
+
+
+
+
+        self.displayFrame = tk.Frame(self.window,bg=colors.blue_3,width=400)
         self.lblLine = tk.Label(
-            self.displayFrame, text="*********************************************************************").pack()
-        self.scrollBar = tk.Scrollbar(self.displayFrame)
+            self.displayFrame, text=self.num_room,bg=colors.blue_3,fg=colors.blue_dark,font=('times new roman', 22)).pack()
+        
+        self.scrollBar = tk.Scrollbar(self.displayFrame,bg=colors.blue_2,activebackground=colors.blue_1)
         self.scrollBar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.tkDisplay = tk.Text(self.displayFrame, height=20, width=55)
-        self.tkDisplay.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 0))
-        self.tkDisplay.tag_config("tag_your_message", foreground="blue")
+        self.tkDisplay = tk.Text(self.displayFrame, height=21, width=55,bg=colors.blue_3)
+        self.tkDisplay.pack(side=tk.TOP, fill=tk.Y, padx=(5, 13))
+        self.tkDisplay.tag_config("tag_your_message", foreground=colors.blue_dark)
+        self.tkDisplay.tag_config("on_user_left", foreground=colors.red)
         self.scrollBar.config(command=self.tkDisplay.yview)
         self.tkDisplay.config(yscrollcommand=self.scrollBar.set,
-                              background="#F4F6F7", highlightbackground="grey", state="disabled")
-        self.displayFrame.pack(side=tk.TOP)
+                              background="white", highlightbackground=colors.blue_light, state="disabled")
+        
 
-        self.bottomFrame = tk.Frame(self.window)
+        self.bottomFrame = tk.Frame(self.displayFrame,bg=colors.blue_3)
         self.tkMessage = tk.Text(self.bottomFrame, height=2, width=55)
-        self.tkMessage.pack(side=tk.LEFT, padx=(5, 13), pady=(5, 10))
-        self.tkMessage.config(highlightbackground="grey", state="normal")
+        self.tkMessage.pack(side=tk.BOTTOM, padx=(5, 13), pady=(5, 10))
+        self.tkMessage.config(highlightbackground="grey", state="normal",fg=colors.blue_dark)
         self.tkMessage.bind("<Return>", (lambda event: self.getChatMessage(
             self.tkMessage.get("1.0", tk.END))))
         self.bottomFrame.pack(side=tk.BOTTOM)
+
+        self.displayFrame.pack(side=tk.LEFT)
+
+        
+        self.window.resizable(0, 0)
         self.window.mainloop()
 
 
@@ -125,6 +176,9 @@ class ChatInterface(Frame):
     #     message.convertToString()
     #     self.controller_sender.send_message(message.msg)
 
+
+
+      
     def leaveRoom(self):
         message = ControllerMessageFormat(
             "onRoomLeave", {"username": self.username,"room":self.num_room})
@@ -203,9 +257,13 @@ class ChatInterface(Frame):
             print("new connection", body)
             message = ControllerMessageFormat()
             message.convertToJson(body.decode())
+
             if message.action == "joined":
                 print('d5alt joiiiiiindedddd')
                 self.users_in_room=message.data['users_in_room']
+                self.liste.delete(0,END)
+                for user in self.users_in_room:
+                    self.liste.insert(END,user)
                 
             # ch.basic_ack(delivery_tag=method.delivery_tag)
         while True:
@@ -264,13 +322,18 @@ class ChatInterface(Frame):
         if action == "left":
             user_left=data['user_left']
 
+            self.users_in_room=data['users_in_room']
+            self.liste.delete(0,END)
+            for user in self.users_in_room:
+                self.liste.insert(END,user)
+
             texts = self.tkDisplay.get("1.0", tk.END).strip()
             self.tkDisplay.config(state=tk.NORMAL)
             if len(texts) < 1:
-                self.tkDisplay.insert(tk.END, user_left)
-            else:
-                self.tkDisplay.insert(tk.END, "\n\n"+user_left)
+                self.tkDisplay.insert(tk.END, user_left+" left the room","on_user_left")
 
+            else:
+                self.tkDisplay.insert(tk.END, "\n\n"+user_left+" left the room","on_user_left")
             self.tkDisplay.config(state=tk.DISABLED)
             self.tkDisplay.see(tk.END)
 
@@ -293,9 +356,9 @@ class ChatInterface(Frame):
                 texts = self.tkDisplay.get("1.0", tk.END).strip()
                 self.tkDisplay.config(state=tk.NORMAL)
                 if len(texts) < 1:
-                    self.tkDisplay.insert(tk.END,decrypted_msg.decode())
+                    self.tkDisplay.insert(tk.END,data['sender']+"-> "+decrypted_msg.decode())
                 else:
-                    self.tkDisplay.insert(tk.END, "\n\n"+decrypted_msg.decode())
+                    self.tkDisplay.insert(tk.END,"\n\n"+data['sender']+"-> "+  decrypted_msg.decode())
 
                 self.tkDisplay.config(state=tk.DISABLED)
                 self.tkDisplay.see(tk.END)
@@ -330,7 +393,7 @@ class ChatInterface(Frame):
                     'message':decodedMsg
                 })
         message = ControllerMessageFormat(action='onMessageSend',data={
-          'data':data   
+          'data':data ,'sender':self.username  
         })
         message.convertToString()
         
