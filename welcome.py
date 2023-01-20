@@ -50,7 +50,7 @@ class Welcome:
 
     def main(self):
         
-        self.root=Tk()  
+        self.root=Toplevel()  
         self.root.geometry('700x400')
         self.root.title("Login Form")
         self.root.config(bg=colors.login_bg)
@@ -180,7 +180,8 @@ class Welcome:
         elif action == "joined":
             print('d5alt joiiiiiindedddd')
             self.users_in_room=data['users_in_room']
-            self.clientInterface()
+            if data['current']==self.username:
+                self.clientInterface()
 
     def clientInterface(self):
         print("d5altttttttttttttttttttttttttt")

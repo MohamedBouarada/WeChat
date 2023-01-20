@@ -62,7 +62,7 @@ class Controller:
             # data={username,room}
             self.rooms[data['room']].append(data['username']) 
             message = ControllerMessageFormat(
-                "joined", {"users_in_room": self.rooms[data['room']]})   
+                "joined", {"users_in_room": self.rooms[data['room']],"current":data['username']})   
             message.convertToString()
             print('beforeeeee room',data['room'])
             self.send(msg=message.msg)

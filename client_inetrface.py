@@ -131,6 +131,7 @@ class ChatInterface(Frame):
 
         message.convertToString()
         self.controller_sender.send_message(message.msg)
+        self.window.withdraw()
         self.welcome()    
 
     def connect(self):
@@ -219,18 +220,18 @@ class ChatInterface(Frame):
             message.convertToJson(body.decode())
             self.handleAction(message.action, message.data)
 
-            print('in', body)
-            self.msg = body
-            # ch.basic_ack(delivery_tag=method.delivery_tag)
-            texts = self.tkDisplay.get("1.0", tk.END).strip()
-            self.tkDisplay.config(state=tk.NORMAL)
-            if len(texts) < 1:
-                self.tkDisplay.insert(tk.END, self.msg.decode())
-            else:
-                self.tkDisplay.insert(tk.END, "\n\n"+self.msg.decode())
+            # print('in', body)
+            # self.msg = body
+            # # ch.basic_ack(delivery_tag=method.delivery_tag)
+            # texts = self.tkDisplay.get("1.0", tk.END).strip()
+            # self.tkDisplay.config(state=tk.NORMAL)
+            # if len(texts) < 1:
+            #     self.tkDisplay.insert(tk.END, self.msg.decode())
+            # else:
+            #     self.tkDisplay.insert(tk.END, "\n\n"+self.msg.decode())
 
-            self.tkDisplay.config(state=tk.DISABLED)
-            self.tkDisplay.see(tk.END)
+            # self.tkDisplay.config(state=tk.DISABLED)
+            # self.tkDisplay.see(tk.END)
 
         while True:
             # from_server = sck.recv(4096).decode()
