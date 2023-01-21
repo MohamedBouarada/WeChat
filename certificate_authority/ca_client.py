@@ -69,7 +69,7 @@ class CaClient:
         # Create a cerificate request
         csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
             # Provide various details about who we are.
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"TalkyWalky"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"WeChat"),
             x509.NameAttribute(NameOID.COMMON_NAME,
                                u"User:"+str(self.username)),
         ])).add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True).sign(key, hashes.SHA256(), default_backend())

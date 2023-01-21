@@ -19,10 +19,11 @@ HOST_PORT = 8080
 
 
 class ChatInterface(Frame):
-    def __init__(self, master=None, username='',num_room='',users_in_room=[]):
+    def __init__(self, master=None, username='',num_room='',users_in_room=[],wlc=None):
         print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-        self.window = tk.Tk()
-        
+        #self.window = tk.Tk()
+        self.window=Toplevel()
+        self.wlc=wlc
         # self.window.title("Client")
         self.username = username
 
@@ -60,11 +61,11 @@ class ChatInterface(Frame):
         self.controller_sender.connect()
 
         self.connect()
-        message = ControllerMessageFormat(
-            "onNewConnection", {"username": self.username})
+        # message = ControllerMessageFormat(
+        #     "onNewConnection", {"username": self.username})
 
-        message.convertToString()
-        self.controller_sender.send_message(message.msg)
+        # message.convertToString()
+        # self.controller_sender.send_message(message.msg)
 
 
         
@@ -131,7 +132,7 @@ class ChatInterface(Frame):
         self.leaveBtn.pack(padx=(1, 1),pady=(1, 1))
 
         self.leaveBtn.bind('<Return>',(lambda event: self.leaveRoom()))
-        self.leaveBtn.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.red, activeforeground=colors.blue_dark)
+        self.leaveBtn.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
 
         self.leftFrame.pack(side=tk.LEFT ,padx=(20, 20),pady=(20,20))
 
@@ -146,7 +147,7 @@ class ChatInterface(Frame):
         self.scrollBar.pack(side=tk.RIGHT, fill=tk.Y)
         self.tkDisplay = tk.Text(self.displayFrame, height=21, width=55,bg=colors.blue_3)
         self.tkDisplay.pack(side=tk.TOP, fill=tk.Y, padx=(5, 13))
-        self.tkDisplay.tag_config("tag_your_message", foreground=colors.blue_dark)
+        self.tkDisplay.tag_config("tag_your_message", foreground=colors.blue_1)
         self.tkDisplay.tag_config("on_user_left", foreground=colors.red)
         self.scrollBar.config(command=self.tkDisplay.yview)
         self.tkDisplay.config(yscrollcommand=self.scrollBar.set,
@@ -185,7 +186,7 @@ class ChatInterface(Frame):
 
         message.convertToString()
         self.controller_sender.send_message(message.msg)
-        self.window.withdraw()
+        #self.window.withdraw()
         self.welcome()    
 
     def connect(self):
@@ -426,8 +427,11 @@ class ChatInterface(Frame):
     def welcome(self):
         self.window.withdraw()
         # self.window.destroy()
+        
         from welcome import Welcome
-        w=Welcome(username=self.username)
+        w=Welcome(username=self.username,fromChat='true')
+       # self.wlc.deiconify()
+        
 
 
 # t=ChatInterface()

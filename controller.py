@@ -58,6 +58,7 @@ class Controller:
             message.convertToString()
             # self.send(message.msg,routing_key='global_receiver')
             self.send(message.msg)
+
         elif action == "onRoomEnter":
             # data={username,room}
             self.rooms[data['room']].append(data['username']) 
@@ -66,6 +67,7 @@ class Controller:
             message.convertToString()
             print('beforeeeee room',data['room'])
             self.send(msg=message.msg)
+
         elif action == "onRoomLeave":
             # data={username,room}
             self.rooms[data['room']].remove(data['username']) 
@@ -73,6 +75,7 @@ class Controller:
                 "left", {"users_in_room": self.rooms[data['room']],"user_left":data['username']})   
             message.convertToString()
             self.send(msg=message.msg,exchange=data['room'])
+
         elif action =='onQuit':
             self.connected_users.remove(data['username'])
             message = ControllerMessageFormat(
@@ -80,6 +83,13 @@ class Controller:
             message.convertToString()
             # self.send(message.msg,routing_key='global_receiver')
             self.send(message.msg)
+        elif action == 'OnGoBackToWelcome':
+             message = ControllerMessageFormat(
+                "wentBack", {"connected_users": self.connected_users, "rooms": self.rooms})
+             message.convertToString()
+            # self.send(message.msg,routing_key='global_receiver')
+             self.send(message.msg)
+
     
 
 c=Controller()

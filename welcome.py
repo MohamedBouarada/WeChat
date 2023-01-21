@@ -13,8 +13,9 @@ from sender import Sender, SenderRabbitmqConfigure
 import colors
 
 class Welcome:
-    def __init__(self,root=None,username=''):
+    def __init__(self,root=None,username='',fromChat='false'):
         
+        self.fromChat=fromChat
         self.root=root
         self.connected_users = []
         self.rooms = {'room1': [], 'room2': [], 'room3': [], 'room4': []}
@@ -51,7 +52,7 @@ class Welcome:
         
         self.connected_users_listbox.place(relx=0.7,rely=0.5,anchor=CENTER)
 
-
+        self.connected_users_listbox.delete(0,tk.END)
         for user in self.connected_users :
                 
             if(user == self.username):
@@ -61,12 +62,22 @@ class Welcome:
             else:
                 self.connected_users_listbox.insert(END,user)
 
+        
+        if(self.fromChat!='true'):
+            message = ControllerMessageFormat(
+                "onNewConnection", {"username": self.username})
 
-        message = ControllerMessageFormat(
-            "onNewConnection", {"username": self.username})
+            message.convertToString()
+           
+            self.controller_sender.send_message(message.msg)
+        else:
+            message = ControllerMessageFormat(
+                "OnGoBackToWelcome", {"username": self.username})
 
-        message.convertToString()
-        self.controller_sender.send_message(message.msg)
+            message.convertToString()
+            self.controller_sender.send_message(message.msg)        
+        
+        
         print('done')   
         self.connect()
         self.main()
@@ -211,6 +222,7 @@ class Welcome:
             self.rooms=data['rooms']
 
             self.connected_users_listbox.delete(0,tk.END)
+            print("usseRRRRRRRRRRR",self.connected_users)
             for user in self.connected_users :
                 if(user == self.username):
                     self.connected_users_listbox.insert(END,user+' (YOU)')
@@ -221,7 +233,7 @@ class Welcome:
 
             
         elif action == "joined":
-            print('d5alt joiiiiiindedddd')
+            print('d5alt joiiiiiindedddd' , self.username)
             self.users_in_room=data['users_in_room']
             if data['current']==self.username:
                 self.clientInterface()
@@ -235,6 +247,17 @@ class Welcome:
                     self.connected_users_listbox.itemconfig(END,{'bg':colors.blue_dark})
                 else:
                     self.connected_users_listbox.insert(END,user)
+        elif action == "wentBack":
+            self.connected_users=data['connected_users']
+            self.connected_users_listbox.delete(0,tk.END)
+            for user in self.connected_users :
+                if(user == self.username):
+                    self.connected_users_listbox.insert(END,user+' (YOU)')
+                    self.connected_users_listbox.itemconfig(END,{'fg':colors.login_bg})
+                    self.connected_users_listbox.itemconfig(END,{'bg':colors.blue_dark})
+                else:
+                    self.connected_users_listbox.insert(END,user)
+
 
     def clientInterface(self):
         print("d5altttttttttttttttttttttttttt")
@@ -243,7 +266,7 @@ class Welcome:
         from client_inetrface import ChatInterface
         
         # self.root.destroy()
-        t=ChatInterface(username=self.username,num_room=self.num_room,users_in_room=self.users_in_room)
+        t=ChatInterface(username=self.username,num_room=self.num_room,users_in_room=self.users_in_room,wlc=self.root)
         print("5raaaaaaaaaajjjjjjjjt")
     def home(self):
         
