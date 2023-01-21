@@ -1,76 +1,87 @@
 from tkinter import *
-from ldap_server import LdapServer
 
-import admin_pwd
 import colors
-from PIL import ImageTk, Image  
+from PIL import ImageTk, Image
+
 
 class HomePage:
-   
-    def __init__(self,root=None):
-        self.root=root
+    def __init__(self, root=None):
+        self.root = root
 
     def signupPage(self):
         self.root.withdraw()
-        # self.root.destroy()
-        
+
         from signup import Signup
+
         login = Signup(base=self.root)
-        # self.root.destroy()
         login.main()
 
     def loginPage(self):
         self.root.withdraw()
-        # self.root.destroy()
-        
         from login import LoginPage
+
         login = LoginPage(base=self.root)
-        # self.root.destroy()
         login.main()
-    
 
     # main frame
     def main(self):
-        
-        self.root=Tk()
+
+        self.root = Tk()
         self.canvas = Canvas(self.root, width=700, height=400)
         self.canvas.pack()
-        IMAGE_PATH = './assets/bg2.jpg'
-        self.img = ImageTk.PhotoImage(Image.open(IMAGE_PATH).resize((700, 400), Image.ANTIALIAS))
+        IMAGE_PATH = "./assets/bg2.jpg"
+        self.img = ImageTk.PhotoImage(
+            Image.open(IMAGE_PATH).resize((700, 400), Image.ANTIALIAS)
+        )
         self.canvas.background = self.img
-        self.bg =self.canvas.create_image(0, 0, anchor=NW, image=self.img)
-        
-
+        self.bg = self.canvas.create_image(0, 0, anchor=NW, image=self.img)
 
         # Page Title
         label_0 = Label(self.root, text="WeChat", width=40, font=("bold", 30))
-        label_0.place(relx=0.5, y=20,anchor=CENTER)
+        label_0.place(relx=0.5, y=20, anchor=CENTER)
         label_0.config(bg=colors.blue_light, fg=colors.blue_dark)
 
-        
         # Submit button
-        btnlogin = Button(self.root, text='SignUp', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command=self.signupPage)
-        btnlogin.place(relx=0.7, y=170,anchor=CENTER)
+        btnlogin = Button(
+            self.root,
+            text="SignUp",
+            width=15,
+            bg=colors.blue_dark,
+            fg=colors.blue_dark,
+            command=self.signupPage,
+        )
+        btnlogin.place(relx=0.7, y=170, anchor=CENTER)
 
-        btnlogin.bind('<Return>', self.signupPage)
-        btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        btnlogin.bind("<Return>", self.signupPage)
+        btnlogin.config(
+            bg=colors.blue_dark,
+            fg="#FFFFFF",
+            activebackground=colors.blue_light,
+            activeforeground=colors.blue_dark,
+        )
 
         # Submit button
-        btnlogin = Button(self.root, text='Login', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command=self.loginPage)
-        btnlogin.place(relx=0.7, y=220,anchor=CENTER)
+        btnlogin = Button(
+            self.root,
+            text="Login",
+            width=15,
+            bg=colors.blue_dark,
+            fg=colors.blue_dark,
+            command=self.loginPage,
+        )
+        btnlogin.place(relx=0.7, y=220, anchor=CENTER)
 
-        btnlogin.bind('<Return>', self.loginPage)
-        btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        btnlogin.bind("<Return>", self.loginPage)
+        btnlogin.config(
+            bg=colors.blue_dark,
+            fg="#FFFFFF",
+            activebackground=colors.blue_light,
+            activeforeground=colors.blue_dark,
+        )
 
         # it is use for display the registration form on the window
         self.root.resizable(0, 0)
         self.root.mainloop()
-        print("Home WeChat :)")
-
-
-
-
-
 
 
 s = HomePage()

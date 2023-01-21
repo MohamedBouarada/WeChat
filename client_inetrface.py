@@ -2,14 +2,13 @@ import tkinter as tk
 from tkinter import *
 
 import colors
-from tkinter import Button, Frame, messagebox
-import socket
+from tkinter import Button, Frame
 import threading
 from controller_message_format import ControllerMessageFormat
 from receiver import Receiver, ReceiverRabbitMqConfigure
 
 from sender import Sender, SenderRabbitmqConfigure
-from rsa_handler import rsa_decrypt , rsa_encrypt
+from rsa_handler import rsa_decrypt, rsa_encrypt
 import base64
 
 # network client
@@ -19,402 +18,276 @@ HOST_PORT = 8080
 
 
 class ChatInterface(Frame):
-    def __init__(self, master=None, username='',num_room='',users_in_room=[],wlc=None):
-        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-        #self.window = tk.Tk()
-        self.window=Toplevel()
-        self.wlc=wlc
-        # self.window.title("Client")
+    def __init__(
+        self, master=None, username="", num_room="", users_in_room=[], wlc=None ,which_room=''
+    ):
+
+        self.window = Toplevel()
+        self.wlc = wlc
         self.username = username
+        self.which_room=which_room
+        self.num_room = num_room
 
         self.connected_users = []
-        self.rooms = {'room1': [], 'room2': [], 'room3': [], 'room4': []}
-        self.users_in_room=users_in_room  
-        self.num_room=num_room
+        self.rooms = {"room1": [], "room2": [], "room3": [], "room4": []}
+        if(self.which_room == self.num_room):
 
-        server = SenderRabbitmqConfigure(queue='hello',
-                                         host='localhost',
-                                         routingKey='hello',
-                                         exchange=self.num_room)
-        serverconfigure = ReceiverRabbitMqConfigure(host='localhost',
-                                                    queue='', exchange=self.num_room)
+            self.users_in_room = users_in_room
+
+        server = SenderRabbitmqConfigure(
+            queue="hello", host="localhost", routingKey="hello", exchange=self.num_room
+        )
+        serverconfigure = ReceiverRabbitMqConfigure(
+            host="localhost", queue="", exchange=self.num_room
+        )
         self.sender = Sender(server)
         self.sender.connect()
         self.receiver = Receiver(config=serverconfigure)
         self.receiver.connect()
-        
-        controller_receiver_config = ReceiverRabbitMqConfigure(host='localhost',
-                                                               queue='', 
-                                                                exchange='controller_exchange', 
-                                                                exchange_type='fanout', 
-                                                                exclusive=False
-                                                                )
+
+        controller_receiver_config = ReceiverRabbitMqConfigure(
+            host="localhost",
+            queue="",
+            exchange="controller_exchange",
+            exchange_type="fanout",
+            exclusive=False,
+        )
         self.controller_receiver = Receiver(controller_receiver_config)
         self.controller_receiver.connect()
 
-        controller_sender_config = SenderRabbitmqConfigure(queue='main_queue',
-                                                           host='localhost',
-                                                           routingKey='main_queue',
-                                                           exchange='from_client_to_controller',
-                                                           exchange_type='direct')
+        controller_sender_config = SenderRabbitmqConfigure(
+            queue="main_queue",
+            host="localhost",
+            routingKey="main_queue",
+            exchange="from_client_to_controller",
+            exchange_type="direct",
+        )
         self.controller_sender = Sender(controller_sender_config)
         self.controller_sender.connect()
-
-        self.connect()
-        # message = ControllerMessageFormat(
-        #     "onNewConnection", {"username": self.username})
-
-        # message.convertToString()
-        # self.controller_sender.send_message(message.msg)
-
-
         
 
-        self.window.geometry('800x500')
+        self.connect()
+
+        self.window.geometry("800x500")
         self.window.title("WeChat")
         self.window.config(background=colors.blue_dark)
 
-        # self.topFrame = tk.Frame(self.window)
-        # # self.lblName = tk.Label(self.topFrame, text = "Name:").pack(side=tk.LEFT)
-        # # self.entName = tk.Entry(self.topFrame)
-        # # self.entName.pack(side=tk.LEFT)
-        # # self.btnConnect = tk.Button(self.topFrame, text="Connect", command=lambda : self.connect())
-        # # self.btnConnect.pack(side=tk.LEFT)
-        # # btnConnect.bind('<Button-1>', connect)
-        # # self.btnlogin = Button(self.window, text='Room1', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.enterRoom("room1"))
-        # # self.btnlogin.place(relx=0, y=2,anchor=CENTER)
-
-        # # self.btnlogin.bind('<Return>',(lambda event: self.enterRoom(room="room1")))
-        # # self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
-
-        # # leave button
-        # self.btnlogin = Button(self.topFrame, text='Leave Room', width=15, bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom())
-        # # self.btnlogin.place(relx=0.5, y=102,anchor=CENTER)
-        # self.btnlogin.pack(side=tk.LEFT)
-
-        # self.btnlogin.bind('<Return>',(lambda event: self.leaveRoom()))
-        # self.btnlogin.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
-
-        # self.topFrame.pack(side=tk.TOP)
-
-        # self.clientFrame = tk.Frame(self.window)
-        # self.lblLine = tk.Label(self.clientFrame, text="**********Client List**********").pack()
-        # self.scrollBar = tk.Scrollbar(self.clientFrame)
-        # self.scrollBar.pack(side=tk.RIGHT, fill=tk.Y)
-        # self.tkDisplay = tk.Text(self.clientFrame, height=15, width=30)
-        # self.tkDisplay.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 0))
-        # self.scrollBar.config(command=self.tkDisplay.yview)
-        # self.tkDisplay.config(yscrollcommand=self.scrollBar.set, background="#F4F6F7", highlightbackground="grey", state="disabled")
-        # self.clientFrame.pack(side=tk.BOTTOM, pady=(5, 10))
-
-
-
-
-
-        self.leftFrame = tk.Frame(self.window,background="white" )
-        self.listTitle=Label(self.leftFrame, text="Chat List",font=('times new roman', 20))
-        self.listTitle.config(fg="white",bg=colors.success_bg,width=15)
+        self.leftFrame = tk.Frame(self.window, background="white")
+        self.listTitle = Label(
+            self.leftFrame, text="Chat List", font=("times new roman", 20)
+        )
+        self.listTitle.config(fg="white", bg=colors.success_bg, width=15)
         self.listTitle.pack()
-        self.liste = Listbox(self.leftFrame,width=25,height=22, bg='white',fg=colors.blue_1)
-        self.liste.delete(0,END)
+        self.liste = Listbox(
+            self.leftFrame, width=25, height=22, bg="white", fg=colors.blue_1
+        )
+        self.liste.delete(0, END)
         for user in self.users_in_room:
-            self.liste.insert(END,user)
-        # self.liste.insert(1, "Mohamed","aaaaaaaaaaaaaaaaaa")
-        # self.liste.insert(2, "Racem")
-        # self.liste.insert(3, "La7nach")
-        # self.liste.insert(4, "Zaaaab")
-        # self.liste.insert(5, "3asba")
-    
+            self.liste.insert(END, user)
+
         self.liste.pack()
 
-        self.leaveBtn = Button(self.leftFrame, text='Leave Room',width=10 ,font=('bold', 15), bg=colors.blue_dark,fg=colors.blue_dark, command= lambda: self.leaveRoom())
-        # self.leaveBtn.place(relx=0.5, y=102,anchor=CENTER)
-        self.leaveBtn.pack(padx=(1, 1),pady=(1, 1))
+        self.leaveBtn = Button(
+            self.leftFrame,
+            text="Leave Room",
+            width=10,
+            font=("bold", 15),
+            bg=colors.blue_dark,
+            fg=colors.blue_dark,
+            command=lambda: self.leaveRoom(),
+        )
+        self.leaveBtn.pack(padx=(1, 1), pady=(1, 1))
 
-        self.leaveBtn.bind('<Return>',(lambda event: self.leaveRoom()))
-        self.leaveBtn.config(bg=colors.blue_dark, fg="#FFFFFF",activebackground=colors.blue_light, activeforeground=colors.blue_dark)
+        self.leaveBtn.bind("<Return>", (lambda event: self.leaveRoom()))
+        self.leaveBtn.config(
+            bg=colors.blue_dark,
+            fg="#FFFFFF",
+            activebackground=colors.blue_light,
+            activeforeground=colors.blue_dark,
+        )
 
-        self.leftFrame.pack(side=tk.LEFT ,padx=(20, 20),pady=(20,20))
+        self.leftFrame.pack(side=tk.LEFT, padx=(20, 20), pady=(20, 20))
 
-
-
-
-        self.displayFrame = tk.Frame(self.window,bg=colors.blue_3,width=400)
+        self.displayFrame = tk.Frame(self.window, bg=colors.blue_3, width=400)
         self.lblLine = tk.Label(
-            self.displayFrame, text=self.num_room,bg=colors.blue_3,fg=colors.blue_dark,font=('times new roman', 22)).pack()
-        
-        self.scrollBar = tk.Scrollbar(self.displayFrame,bg=colors.blue_2,activebackground=colors.blue_1)
+            self.displayFrame,
+            text=self.num_room,
+            bg=colors.blue_3,
+            fg=colors.blue_dark,
+            font=("times new roman", 22),
+        ).pack()
+
+        self.scrollBar = tk.Scrollbar(
+            self.displayFrame, bg=colors.blue_2, activebackground=colors.blue_1
+        )
         self.scrollBar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.tkDisplay = tk.Text(self.displayFrame, height=21, width=55,bg=colors.blue_3)
+        self.tkDisplay = tk.Text(
+            self.displayFrame, height=21, width=55, bg=colors.blue_3
+        )
         self.tkDisplay.pack(side=tk.TOP, fill=tk.Y, padx=(5, 13))
         self.tkDisplay.tag_config("tag_your_message", foreground=colors.blue_1)
         self.tkDisplay.tag_config("on_user_left", foreground=colors.red)
         self.scrollBar.config(command=self.tkDisplay.yview)
-        self.tkDisplay.config(yscrollcommand=self.scrollBar.set,
-                              background="white", highlightbackground=colors.blue_light, state="disabled")
-        
+        self.tkDisplay.config(
+            yscrollcommand=self.scrollBar.set,
+            background="white",
+            highlightbackground=colors.blue_light,
+            state="disabled",
+        )
 
-        self.bottomFrame = tk.Frame(self.displayFrame,bg=colors.blue_3)
+        self.bottomFrame = tk.Frame(self.displayFrame, bg=colors.blue_3)
         self.tkMessage = tk.Text(self.bottomFrame, height=2, width=55)
         self.tkMessage.pack(side=tk.BOTTOM, padx=(5, 13), pady=(5, 10))
-        self.tkMessage.config(highlightbackground="grey", state="normal",fg=colors.blue_dark)
-        self.tkMessage.bind("<Return>", (lambda event: self.getChatMessage(
-            self.tkMessage.get("1.0", tk.END))))
+        self.tkMessage.config(
+            highlightbackground="grey", state="normal", fg=colors.blue_dark
+        )
+        self.tkMessage.bind(
+            "<Return>",
+            (lambda event: self.getChatMessage(self.tkMessage.get("1.0", tk.END))),
+        )
         self.bottomFrame.pack(side=tk.BOTTOM)
 
         self.displayFrame.pack(side=tk.LEFT)
 
-        
         self.window.resizable(0, 0)
         self.window.mainloop()
 
-
-
-    # def enterRoom(self,room):
-    #     message = ControllerMessageFormat(
-    #         "onRoomEnter", {"username": self.username,"room":room})
-
-    #     message.convertToString()
-    #     self.controller_sender.send_message(message.msg)
-
-
-
-      
     def leaveRoom(self):
         message = ControllerMessageFormat(
-            "onRoomLeave", {"username": self.username,"room":self.num_room})
+            "onRoomLeave", {"username": self.username, "room": self.num_room}
+        )
 
         message.convertToString()
         self.controller_sender.send_message(message.msg)
-        #self.window.withdraw()
-        self.welcome()    
+        # self.window.withdraw()
+        self.welcome()
 
     def connect(self):
         global client
-        # if len(self.entName.get()) < 1:
-        #     tk.messagebox.showerror(title="ERROR!!!", message="You MUST enter your first name <e.g. John>")
-        # else:
-        # self.username = self.entName.get()
-        print(self.username)
         self.connect_to_server(self.username)
-        # server = SenderRabbitmqConfigure(queue='hello',
-        #                    host='localhost',
-        #                    routingKey='hello',
-        #                    exchange='room1')
-        # sender = Sender(server)
-        # sender.connect()
-        # sender.send_message(msg="hello ya zebi")
-        # serverconfigure = ReceiverRabbitMqConfigure(host='localhost',
-        #                                   queue='hello',exchange='room1')
-
-        # receiver = Receiver(config=serverconfigure)
-        # receiver.connect()
-        # receiver.async_consumer(cb=self.print_success)
-
-    def print_success(self, *args):
-        print("success")
-        print(args)
 
     def connect_to_server(self, name):
         global client, HOST_PORT, HOST_ADDR
         try:
-            # print(self.username)
-            # client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            # client.connect((HOST_ADDR, HOST_PORT))
-            # client.send(self.username.encode()) # Send name to server after connecting
-
-            # self.entName.config(state=tk.DISABLED)
-            # self.btnConnect.config(state=tk.DISABLED)
-            # self.tkMessage.config(state=tk.NORMAL)
-
-            # start a thread to keep receiving message from server
-            # do not block the main thread :)
-            # threading._start_new_thread(self.receive_message_from_server, (client, "m"))
-            # threading._start_new_thread(self.receiver.async_consumer(cb=self.receive_message_from_server), (client, "m"))
-            # server = SenderRabbitmqConfigure(queue=self.username,
-            #                    host='localhost',
-            #                    routingKey='hello',
-            #                    exchange='room1')
-            # serverconfigure = ReceiverRabbitMqConfigure(host='localhost',
-            #                                     queue=self.username,exchange='room1')
-            # self.sender = Sender(server)
-            # self.sender.connect()
-            # self.receiver = Receiver(config=serverconfigure)
-            # self.receiver.connect()
-            # self.tkMessage.bind("<Return>", (lambda event: self.getChatMessage(self.tkMessage.get("1.0", tk.END))))
-
-            # self.receive_message_from_server, ("client",)
+            threading._start_new_thread(self.receive_message_from_server, ("client",))
             threading._start_new_thread(
-                self.receive_message_from_server, ("client",))
-            threading._start_new_thread(
-                self.receive_message_from_controller, ("client",))
+                self.receive_message_from_controller, ("client",)
+            )
         except Exception as e:
             print(e)
-            tk.messagebox.showerror(title="ERROR!!!", message="Cannot connect to host: " + HOST_ADDR +
-                                    " on port: " + str(HOST_PORT) + " Server may be Unavailable. Try again later")
+            tk.messagebox.showerror(
+                title="ERROR!!!",
+                message="Cannot connect to host: "
+                + HOST_ADDR
+                + " on port: "
+                + str(HOST_PORT)
+                + " Server may be Unavailable. Try again later",
+            )
 
     def receive_message_from_controller(self, c):
         def callback(ch, method, properties, body):
-            print("new connection", body)
             message = ControllerMessageFormat()
             message.convertToJson(body.decode())
 
             if message.action == "joined":
-                print('d5alt joiiiiiindedddd')
-                self.users_in_room=message.data['users_in_room']
-                self.liste.delete(0,END)
-                for user in self.users_in_room:
-                    self.liste.insert(END,user)
-                
-            # ch.basic_ack(delivery_tag=method.delivery_tag)
+                if(message.data['num_room']==self.num_room):
+                    self.users_in_room = message.data["users_in_room"]
+                    self.liste.delete(0, END)
+                    for user in self.users_in_room:
+                        self.liste.insert(END, user)
+
         while True:
-            print("in loop")
             self.controller_receiver.listen_channel(callback)
 
     def receive_message_from_server(self, c):
-        self.msg = ''
+        self.msg = ""
 
         def callback(ch, method, properties, body):
             message = ControllerMessageFormat()
             message.convertToJson(body.decode())
             self.handleAction(message.action, message.data)
 
-            # print('in', body)
-            # self.msg = body
-            # # ch.basic_ack(delivery_tag=method.delivery_tag)
-            # texts = self.tkDisplay.get("1.0", tk.END).strip()
-            # self.tkDisplay.config(state=tk.NORMAL)
-            # if len(texts) < 1:
-            #     self.tkDisplay.insert(tk.END, self.msg.decode())
-            # else:
-            #     self.tkDisplay.insert(tk.END, "\n\n"+self.msg.decode())
-
-            # self.tkDisplay.config(state=tk.DISABLED)
-            # self.tkDisplay.see(tk.END)
-
         while True:
-            # from_server = sck.recv(4096).decode()
-            print('befoooooooooooooooree')
             self.receiver.listen_channel(callback)
-            # if not from_server: break
 
-            print('out', self.msg)
-            # display message from server on the chat window
-
-            # enable the display area and insert the text and then disable.
-            # why? Apparently, tkinter does not allow us insert into a disabled Text widget :(
-
-            # texts = self.tkDisplay.get("1.0", tk.END).strip()
-            # self.tkDisplay.config(state=tk.NORMAL)
-            # if len(texts) < 1:
-            #     self.tkDisplay.insert(tk.END, self.msg)
-            # else:
-            #     self.tkDisplay.insert(tk.END, "\n\n"+self.msg)
-
-            # self.tkDisplay.config(state=tk.DISABLED)
-            # self.tkDisplay.see(tk.END)
-
-            # print("Server says: " +from_server)
-
-        # sck.close()
-        # self.window.destroy()
-
-    def handleAction(self,action,data):
+    def handleAction(self, action, data):
         if action == "left":
-            user_left=data['user_left']
+            user_left = data["user_left"]
 
-            self.users_in_room=data['users_in_room']
-            self.liste.delete(0,END)
+            self.users_in_room = data["users_in_room"]
+            self.liste.delete(0, END)
             for user in self.users_in_room:
-                self.liste.insert(END,user)
+                self.liste.insert(END, user)
 
             texts = self.tkDisplay.get("1.0", tk.END).strip()
             self.tkDisplay.config(state=tk.NORMAL)
             if len(texts) < 1:
-                self.tkDisplay.insert(tk.END, user_left+" left the room","on_user_left")
+                self.tkDisplay.insert(
+                    tk.END, user_left + " left the room", "on_user_left"
+                )
 
             else:
-                self.tkDisplay.insert(tk.END, "\n\n"+user_left+" left the room","on_user_left")
+                self.tkDisplay.insert(
+                    tk.END, "\n\n" + user_left + " left the room", "on_user_left"
+                )
             self.tkDisplay.config(state=tk.DISABLED)
             self.tkDisplay.see(tk.END)
 
-        elif action=='onMessageSend':
-            msgArray = data['data']
-            print('ARAAAAAAAAAAAAAAAAAAAAAAAAy' , msgArray)
-            encrypted_msg=''
-            for element in msgArray:
-                if element['username'] == self.username:
-                    #encrypted_msg = base64.b64encode(element['message'].encode())
-                    print('woooooooohoooooooo' , encrypted_msg)
-                    encrypted_msg=element['message']
-                    break
-                    #encrypted_msg = str.encode(encrypted_msg)
-                    #encrypted_msg = base64.b64encode(encrypted_msg)
+        elif action == "onMessageSend":
+            msgArray = data["data"]
 
-            if len(encrypted_msg)>0:
-                decrypted_msg = rsa_decrypt(encrypted_message=encrypted_msg , receiver_username=self.username)
-                print("yalaaaaaaaaaaaaaaaaaaaaaaaa" , decrypted_msg)
+            encrypted_msg = ""
+            for element in msgArray:
+                if element["username"] == self.username:
+                    encrypted_msg = element["message"]
+                    break
+
+            if len(encrypted_msg) > 0:
+                decrypted_msg = rsa_decrypt(
+                    encrypted_message=encrypted_msg, receiver_username=self.username
+                )
                 texts = self.tkDisplay.get("1.0", tk.END).strip()
                 self.tkDisplay.config(state=tk.NORMAL)
                 if len(texts) < 1:
-                    self.tkDisplay.insert(tk.END,data['sender']+"-> "+decrypted_msg.decode())
+                    self.tkDisplay.insert(
+                        tk.END, data["sender"] + "-> " + decrypted_msg.decode()
+                    )
                 else:
-                    self.tkDisplay.insert(tk.END,"\n\n"+data['sender']+"-> "+  decrypted_msg.decode())
+                    self.tkDisplay.insert(
+                        tk.END, "\n\n" + data["sender"] + "-> " + decrypted_msg.decode()
+                    )
 
                 self.tkDisplay.config(state=tk.DISABLED)
                 self.tkDisplay.see(tk.END)
 
-
-        # if action == "connected":
-        #     self.connected_users=data["connected_users"]
-        #     self.rooms=data['rooms']
-        #     #todo later
-
-            
-        # elif action == "joined":
-        #      self.users_in_room=data['users_in_room']
-        #      print(self.users_in_room,'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM')
-           
-
     def getChatMessage(self, msg):
 
-        msg = msg.replace('\n', '')
+        msg = msg.replace("\n", "")
         texts = self.tkDisplay.get("1.0", tk.END).strip()
-        data=[]
+        data = []
         for user in self.users_in_room:
-            if(user != self.username):
-                encrypted = rsa_encrypt(message=msg,receiver_username=user)
-                print('level111111111' , encrypted)
+            if user != self.username:
+                encrypted = rsa_encrypt(message=msg, receiver_username=user)
                 decodedMsg = base64.b64decode(encrypted)
-                #decodedMsg.decode('utf-16')
-                decodedMsg= encrypted.decode('utf-8','strict')
+                decodedMsg = encrypted.decode("utf-8", "strict")
 
-                data.append({
-                    'username':user,
-                    'message':decodedMsg
-                })
-        message = ControllerMessageFormat(action='onMessageSend',data={
-          'data':data ,'sender':self.username  
-        })
+                data.append({"username": user, "message": decodedMsg})
+        message = ControllerMessageFormat(
+            action="onMessageSend", data={"data": data, "sender": self.username}
+        )
         message.convertToString()
-        
+
         self.sender.send_message(msg=message.msg)
-        # enable the display area and insert the text and then disable.
-        # why? Apparently, tkinter does not allow use insert into a disabled Text widget :(
         self.tkDisplay.config(state=tk.NORMAL)
         if len(texts) < 1:
-            self.tkDisplay.insert(tk.END, "You->" + msg,
-                                  "tag_your_message")  # no line
+            self.tkDisplay.insert(tk.END, "You->" + msg, "tag_your_message")  # no line
         else:
-            self.tkDisplay.insert(
-                tk.END, "\n\n" + "You->" + msg, "tag_your_message")
+            self.tkDisplay.insert(tk.END, "\n\n" + "You->" + msg, "tag_your_message")
 
         self.tkDisplay.config(state=tk.DISABLED)
 
-        # self.send_mssage_to_server(msg)
-
         self.tkDisplay.see(tk.END)
-        self.tkMessage.delete('1.0', tk.END)
+        self.tkMessage.delete("1.0", tk.END)
 
     def send_mssage_to_server(self, msg):
         client_msg = str(msg)
@@ -422,16 +295,12 @@ class ChatInterface(Frame):
         if msg == "exit":
             client.close()
             self.window.destroy()
-        print("Sending message")
 
     def welcome(self):
         self.window.withdraw()
-        # self.window.destroy()
-        
         from welcome import Welcome
-        w=Welcome(username=self.username,fromChat='true')
-       # self.wlc.deiconify()
-        
+
+        w = Welcome(username=self.username, fromChat="true")
 
 
 # t=ChatInterface()
