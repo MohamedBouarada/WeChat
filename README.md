@@ -83,6 +83,7 @@ A chatroom application written in python , that is based on RabbitMQ using LDAP 
         - CA_CLIENT_CERT_DIR (the path to the directory which will contain the clients' certificates)
         - CA_CLIENT_KEY_DIR (the path to the directory which will contain the clients' private keys)
         - CA_CLIENT_CSR_DIR (the path to the directory which will contain the clients' certificate requests)
+        - LDAP_DC (the domain's name in the connection string of LDAP server)
         
 ### 6. Create an Instance of Authority-server
 
